@@ -252,10 +252,10 @@ function BukuPage() {
                       <span className="text-muted-foreground"> / {b.jumlah_total}</span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button size="sm" variant="ghost" onClick={() => openEdit(b)}>
+                      <Button size="sm" variant="ghost" onClick={() => openEdit(b)} aria-label={`Edit buku ${b.judul}`}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => setDeleteId(b.id)}>
+                      <Button size="sm" variant="ghost" onClick={() => setDeleteId(b.id)} aria-label={`Hapus buku ${b.judul}`}>
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </td>
