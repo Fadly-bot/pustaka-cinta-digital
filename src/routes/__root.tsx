@@ -84,12 +84,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Sistem Informasi Perpustakaan Literasi KKN" },
       { property: "og:description", content: "Sistem digital pencatatan buku, peminjaman, dan pengembalian untuk perpustakaan desa/sekolah." },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Sistem Informasi Perpustakaan Literasi KKN" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Sistem Informasi Perpustakaan Literasi KKN" },
-      { name: "twitter:description", content: "Sistem digital pencatatan buku, peminjaman, dan pengembalian untuk perpustakaan desa/sekolah." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/74b19d72-3ed3-4d30-878d-e29a71977ea6" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/74b19d72-3ed3-4d30-878d-e29a71977ea6" },
     ],
     links: [
       {
@@ -103,6 +100,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              name: "Sistem Informasi Perpustakaan Literasi KKN",
+              url: "https://perpustakaansemestaalam.lovable.app",
+              description:
+                "Sistem digital pencatatan buku, peminjaman, dan pengembalian untuk perpustakaan desa/sekolah.",
+            },
+            {
+              "@type": "WebSite",
+              name: "Sistem Informasi Perpustakaan Literasi KKN",
+              url: "https://perpustakaansemestaalam.lovable.app",
+            },
+          ],
+        }),
       },
     ],
   }),
