@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as DaftarPeminjamRouteImport } from './routes/daftar-peminjam'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicSeedAdminRouteImport } from './routes/api/public/seed-admin'
 
@@ -22,6 +23,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DaftarPeminjamRoute = DaftarPeminjamRouteImport.update({
+  id: '/daftar-peminjam',
+  path: '/daftar-peminjam',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,12 +43,14 @@ const ApiPublicSeedAdminRoute = ApiPublicSeedAdminRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/daftar-peminjam': typeof DaftarPeminjamRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/daftar-peminjam': typeof DaftarPeminjamRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
@@ -50,20 +58,38 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/daftar-peminjam': typeof DaftarPeminjamRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/reset-password' | '/api/public/seed-admin'
+  fullPaths:
+    | '/'
+    | '/daftar-peminjam'
+    | '/login'
+    | '/reset-password'
+    | '/api/public/seed-admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/reset-password' | '/api/public/seed-admin'
-  id: '__root__' | '/' | '/login' | '/reset-password' | '/api/public/seed-admin'
+  to:
+    | '/'
+    | '/daftar-peminjam'
+    | '/login'
+    | '/reset-password'
+    | '/api/public/seed-admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/daftar-peminjam'
+    | '/login'
+    | '/reset-password'
+    | '/api/public/seed-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DaftarPeminjamRoute: typeof DaftarPeminjamRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicSeedAdminRoute: typeof ApiPublicSeedAdminRoute
@@ -85,6 +111,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/daftar-peminjam': {
+      id: '/daftar-peminjam'
+      path: '/daftar-peminjam'
+      fullPath: '/daftar-peminjam'
+      preLoaderRoute: typeof DaftarPeminjamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +137,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DaftarPeminjamRoute: DaftarPeminjamRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicSeedAdminRoute: ApiPublicSeedAdminRoute,

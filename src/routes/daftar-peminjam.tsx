@@ -38,7 +38,11 @@ function DaftarPeminjamPage() {
     }
     setLoading(true);
     const payload = { ...parsed.data, email: parsed.data.email || null };
-    const { data, error } = await supabase.from("peminjam").insert(payload).select("kode_peminjam").single();
+    const { data, error } = await supabase
+      .from("peminjam")
+      .insert(payload as never)
+      .select("kode_peminjam")
+      .single();
     setLoading(false);
     if (error) {
       toast.error("Gagal mendaftar: " + error.message);
