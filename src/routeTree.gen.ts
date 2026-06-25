@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DaftarPeminjamRouteImport } from './routes/daftar-peminjam'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as ApiPublicSeedAdminRouteImport } from './routes/api/public/seed-admin'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -30,10 +32,20 @@ const DaftarPeminjamRoute = DaftarPeminjamRouteImport.update({
   path: '/daftar-peminjam',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
 } as any)
 const ApiPublicSeedAdminRoute = ApiPublicSeedAdminRouteImport.update({
   id: '/api/public/seed-admin',
@@ -43,9 +55,11 @@ const ApiPublicSeedAdminRoute = ApiPublicSeedAdminRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
   '/daftar-peminjam': typeof DaftarPeminjamRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/': typeof AppIndexRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRoutesByTo {
@@ -53,23 +67,28 @@ export interface FileRoutesByTo {
   '/daftar-peminjam': typeof DaftarPeminjamRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app': typeof AppIndexRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
   '/daftar-peminjam': typeof DaftarPeminjamRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/': typeof AppIndexRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/app'
     | '/daftar-peminjam'
     | '/login'
     | '/reset-password'
+    | '/app/'
     | '/api/public/seed-admin'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -77,18 +96,22 @@ export interface FileRouteTypes {
     | '/daftar-peminjam'
     | '/login'
     | '/reset-password'
+    | '/app'
     | '/api/public/seed-admin'
   id:
     | '__root__'
     | '/'
+    | '/app'
     | '/daftar-peminjam'
     | '/login'
     | '/reset-password'
+    | '/app/'
     | '/api/public/seed-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   DaftarPeminjamRoute: typeof DaftarPeminjamRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -118,12 +141,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DaftarPeminjamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/api/public/seed-admin': {
       id: '/api/public/seed-admin'
@@ -135,8 +172,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   DaftarPeminjamRoute: DaftarPeminjamRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
