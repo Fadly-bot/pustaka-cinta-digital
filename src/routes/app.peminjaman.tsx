@@ -240,7 +240,7 @@ function PeminjamanPage() {
                         }}
                         className="w-20"
                       />
-                      <Button type="button" variant="ghost" size="icon" onClick={() => setItems(items.filter((_, i) => i !== idx))}>
+                      <Button type="button" variant="ghost" size="icon" aria-label="Hapus buku dari daftar" onClick={() => setItems(items.filter((_, i) => i !== idx))}>
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </li>
