@@ -15,6 +15,7 @@ import { Route as DaftarPeminjamRouteImport } from './routes/daftar-peminjam'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppKategoriRouteImport } from './routes/app.kategori'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppBukuRouteImport } from './routes/app.buku'
 import { Route as ApiPublicSeedAdminRouteImport } from './routes/api/public/seed-admin'
@@ -49,6 +50,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppKategoriRoute = AppKategoriRouteImport.update({
+  id: '/kategori',
+  path: '/kategori',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/app/buku': typeof AppBukuRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/kategori': typeof AppKategoriRoute
   '/app/': typeof AppIndexRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/app/buku': typeof AppBukuRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/kategori': typeof AppKategoriRoute
   '/app': typeof AppIndexRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/app/buku': typeof AppBukuRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/kategori': typeof AppKategoriRoute
   '/app/': typeof AppIndexRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/app/buku'
     | '/app/dashboard'
+    | '/app/kategori'
     | '/app/'
     | '/api/public/seed-admin'
   fileRoutesByTo: FileRoutesByTo
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/app/buku'
     | '/app/dashboard'
+    | '/app/kategori'
     | '/app'
     | '/api/public/seed-admin'
   id:
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/app/buku'
     | '/app/dashboard'
+    | '/app/kategori'
     | '/app/'
     | '/api/public/seed-admin'
   fileRoutesById: FileRoutesById
@@ -186,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/kategori': {
+      id: '/app/kategori'
+      path: '/kategori'
+      fullPath: '/app/kategori'
+      preLoaderRoute: typeof AppKategoriRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/dashboard': {
       id: '/app/dashboard'
       path: '/dashboard'
@@ -213,12 +232,14 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppBukuRoute: typeof AppBukuRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppKategoriRoute: typeof AppKategoriRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppBukuRoute: AppBukuRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppKategoriRoute: AppKategoriRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
