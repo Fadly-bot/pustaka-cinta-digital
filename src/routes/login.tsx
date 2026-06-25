@@ -10,6 +10,16 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
   ssr: false,
+  head: () => ({
+    meta: [
+      { title: "Masuk - Sistem Informasi Perpustakaan Literasi KKN" },
+      { name: "description", content: "Masuk ke Sistem Informasi Perpustakaan Literasi KKN untuk admin dan petugas perpustakaan desa/sekolah." },
+      { property: "og:title", content: "Masuk - Perpustakaan Literasi KKN" },
+      { property: "og:description", content: "Halaman masuk untuk admin dan petugas perpustakaan digital KKN." },
+      { property: "og:url", content: "https://perpustakaansemestaalam.lovable.app/login" },
+    ],
+    links: [{ rel: "canonical", href: "https://perpustakaansemestaalam.lovable.app/login" }],
+  }),
   component: LoginPage,
 });
 
@@ -51,15 +61,15 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-secondary/40">
+    <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-secondary/40">
       <div className="w-full max-w-md">
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="h-11 w-11 rounded-xl bg-primary flex items-center justify-center text-primary-foreground">
             <BookOpen className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold leading-tight">Perpustakaan Literasi KKN</h1>
-            <p className="text-xs text-muted-foreground">Sistem Informasi Perpustakaan</p>
+            <h1 className="text-lg font-semibold leading-tight">Sistem Informasi Perpustakaan Literasi KKN</h1>
+            <p className="text-xs text-muted-foreground">Digitalisasi perpustakaan desa & sekolah</p>
           </div>
         </div>
 
@@ -122,6 +132,6 @@ function LoginPage() {
         </Card>
 
       </div>
-    </div>
+    </main>
   );
 }
