@@ -20,6 +20,28 @@ const schema = z.object({
 
 export const Route = createFileRoute("/daftar-peminjam")({
   ssr: false,
+  head: () => ({
+    meta: [
+      { title: "Daftar Peminjam Baru - Perpustakaan Literasi KKN" },
+      { name: "description", content: "Formulir pendaftaran peminjam baru perpustakaan literasi KKN. Daftar gratis untuk meminjam buku di perpustakaan desa atau sekolah." },
+      { property: "og:title", content: "Daftar Peminjam Baru - Perpustakaan Literasi KKN" },
+      { property: "og:description", content: "Daftar sebagai peminjam perpustakaan literasi KKN untuk masyarakat dan siswa." },
+      { property: "og:url", content: "https://perpustakaansemestaalam.lovable.app/daftar-peminjam" },
+    ],
+    links: [{ rel: "canonical", href: "https://perpustakaansemestaalam.lovable.app/daftar-peminjam" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          name: "Pendaftaran Peminjam Baru",
+          description: "Formulir pendaftaran peminjam perpustakaan literasi KKN.",
+          url: "https://perpustakaansemestaalam.lovable.app/daftar-peminjam",
+        }),
+      },
+    ],
+  }),
   component: DaftarPeminjamPage,
 });
 
@@ -53,11 +75,11 @@ function DaftarPeminjamPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-secondary/40 p-4">
+      <main className="min-h-screen flex items-center justify-center bg-secondary/40 p-4">
         <Card className="w-full max-w-md text-center">
           <CardContent className="pt-10 pb-8 space-y-4">
             <CheckCircle2 className="h-14 w-14 text-primary mx-auto" />
-            <h2 className="text-xl font-semibold">Pendaftaran Berhasil</h2>
+            <h1 className="text-xl font-semibold">Pendaftaran Berhasil</h1>
             <p className="text-sm text-muted-foreground">
               Kode peminjam Anda:
             </p>
@@ -68,19 +90,20 @@ function DaftarPeminjamPage() {
             <Button asChild className="w-full mt-4"><Link to="/login">Kembali ke Halaman Login</Link></Button>
           </CardContent>
         </Card>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-secondary/40 py-10 px-4">
+    <main className="min-h-screen bg-secondary/40 py-10 px-4">
       <div className="max-w-2xl mx-auto">
         <Link to="/login" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
           <ArrowLeft className="h-4 w-4" /> Kembali ke Login
         </Link>
+        <h1 className="text-2xl font-semibold tracking-tight mb-4">Pendaftaran Peminjam Baru</h1>
         <Card>
           <CardHeader>
-            <CardTitle>Pendaftaran Peminjam Baru</CardTitle>
+            <CardTitle>Formulir Pendaftaran</CardTitle>
             <CardDescription>Lengkapi data berikut untuk terdaftar sebagai peminjam perpustakaan.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -114,6 +137,6 @@ function DaftarPeminjamPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </main>
   );
 }

@@ -73,7 +73,7 @@ function KategoriPage() {
               {data.map((k) => (
                 <li key={k.id} className="flex items-center justify-between px-4 py-3">
                   <span className="text-sm">{k.nama_kategori}</span>
-                  <Button size="sm" variant="ghost" onClick={() => onDelete(k.id)}>
+                  <Button size="sm" variant="ghost" onClick={() => onDelete(k.id)} aria-label={`Hapus kategori ${k.nama_kategori}`}>
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </li>

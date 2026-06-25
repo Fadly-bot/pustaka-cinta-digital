@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DaftarPeminjamRouteImport } from './routes/daftar-peminjam'
@@ -24,6 +25,11 @@ import { Route as AppKategoriRouteImport } from './routes/app.kategori'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppBukuRouteImport } from './routes/app.buku'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/daftar-peminjam': typeof DaftarPeminjamRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/app/buku': typeof AppBukuRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/kategori': typeof AppKategoriRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/daftar-peminjam': typeof DaftarPeminjamRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/app/buku': typeof AppBukuRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/kategori': typeof AppKategoriRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/daftar-peminjam': typeof DaftarPeminjamRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/app/buku': typeof AppBukuRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/kategori': typeof AppKategoriRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/daftar-peminjam'
     | '/login'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/app/buku'
     | '/app/dashboard'
     | '/app/kategori'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/daftar-peminjam'
     | '/login'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/app/buku'
     | '/app/dashboard'
     | '/app/kategori'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/daftar-peminjam'
     | '/login'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/app/buku'
     | '/app/dashboard'
     | '/app/kategori'
@@ -199,10 +211,18 @@ export interface RootRouteChildren {
   DaftarPeminjamRoute: typeof DaftarPeminjamRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -336,6 +356,7 @@ const rootRouteChildren: RootRouteChildren = {
   DaftarPeminjamRoute: DaftarPeminjamRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

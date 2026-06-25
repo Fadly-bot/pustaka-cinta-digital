@@ -124,7 +124,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <div className="flex-1 lg:ml-64 flex flex-col min-w-0">
         <header className="lg:hidden border-b px-4 h-14 flex items-center gap-3 bg-background sticky top-0 z-30">
-          <Button variant="ghost" size="icon" onClick={() => setOpen(true)}>
+          <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label="Buka menu navigasi">
             <Menu className="h-5 w-5" />
           </Button>
           <span className="font-semibold text-sm">Perpustakaan Literasi KKN</span>
