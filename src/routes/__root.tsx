@@ -86,6 +86,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Sistem Informasi Perpustakaan Literasi KKN" },
+      { name: "twitter:description", content: "Sistem digital pencatatan buku, peminjaman, dan pengembalian untuk perpustakaan desa/sekolah." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/74b19d72-3ed3-4d30-878d-e29a71977ea6" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/74b19d72-3ed3-4d30-878d-e29a71977ea6" },
     ],
     links: [
       {
