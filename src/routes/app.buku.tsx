@@ -139,6 +139,7 @@ function BukuPage() {
       lokasi_rak: form.lokasi_rak || null,
       cover_url: form.cover_url || null,
     };
+    const isEditing = Boolean(editing);
 
     if (editing) {
       const diff = total - editing.jumlah_total;
@@ -158,9 +159,14 @@ function BukuPage() {
       if (error) return toast.error(error.message);
       toast.success("Buku ditambahkan");
     }
+    if (!isEditing) {
+      setSearch("");
+      setFilterKat("all");
+    }
     setOpen(false);
-    qc.invalidateQueries({ queryKey: ["buku"] });
-    qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
+    await qc.invalidateQueries({ queryKey: ["buku"] });
+    await qc.refetchQueries({ queryKey: ["buku"], type: "active" });
+    await qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
   };
 
   const onDelete = async () => {
