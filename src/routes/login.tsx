@@ -21,8 +21,6 @@ function LoginPage() {
   const [resetMode, setResetMode] = useState(false);
 
   useEffect(() => {
-    // Auto-seed admin defaults on first visit (idempotent)
-    fetch("/api/public/seed-admin").catch(() => {});
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/app/dashboard" });
     });
@@ -123,9 +121,6 @@ function LoginPage() {
           </CardContent>
         </Card>
 
-        <p className="text-xs text-muted-foreground text-center mt-6">
-          Akun admin default sudah disiapkan otomatis pada saat halaman ini dimuat pertama kali.
-        </p>
       </div>
     </div>
   );
