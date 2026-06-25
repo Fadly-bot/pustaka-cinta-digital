@@ -15,6 +15,7 @@ import { Route as DaftarPeminjamRouteImport } from './routes/daftar-peminjam'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppPengembalianRouteImport } from './routes/app.pengembalian'
 import { Route as AppPeminjamanRouteImport } from './routes/app.peminjaman'
 import { Route as AppPeminjamRouteImport } from './routes/app.peminjam'
 import { Route as AppKategoriRouteImport } from './routes/app.kategori'
@@ -50,6 +51,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPengembalianRoute = AppPengembalianRouteImport.update({
+  id: '/pengembalian',
+  path: '/pengembalian',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPeminjamanRoute = AppPeminjamanRouteImport.update({
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/app/kategori': typeof AppKategoriRoute
   '/app/peminjam': typeof AppPeminjamRoute
   '/app/peminjaman': typeof AppPeminjamanRoute
+  '/app/pengembalian': typeof AppPengembalianRoute
   '/app/': typeof AppIndexRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/app/kategori': typeof AppKategoriRoute
   '/app/peminjam': typeof AppPeminjamRoute
   '/app/peminjaman': typeof AppPeminjamanRoute
+  '/app/pengembalian': typeof AppPengembalianRoute
   '/app': typeof AppIndexRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/app/kategori': typeof AppKategoriRoute
   '/app/peminjam': typeof AppPeminjamRoute
   '/app/peminjaman': typeof AppPeminjamanRoute
+  '/app/pengembalian': typeof AppPengembalianRoute
   '/app/': typeof AppIndexRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
     | '/app/kategori'
     | '/app/peminjam'
     | '/app/peminjaman'
+    | '/app/pengembalian'
     | '/app/'
     | '/api/public/seed-admin'
   fileRoutesByTo: FileRoutesByTo
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/app/kategori'
     | '/app/peminjam'
     | '/app/peminjaman'
+    | '/app/pengembalian'
     | '/app'
     | '/api/public/seed-admin'
   id:
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
     | '/app/kategori'
     | '/app/peminjam'
     | '/app/peminjaman'
+    | '/app/pengembalian'
     | '/app/'
     | '/api/public/seed-admin'
   fileRoutesById: FileRoutesById
@@ -222,6 +234,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/pengembalian': {
+      id: '/app/pengembalian'
+      path: '/pengembalian'
+      fullPath: '/app/pengembalian'
+      preLoaderRoute: typeof AppPengembalianRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/peminjaman': {
       id: '/app/peminjaman'
       path: '/peminjaman'
@@ -273,6 +292,7 @@ interface AppRouteChildren {
   AppKategoriRoute: typeof AppKategoriRoute
   AppPeminjamRoute: typeof AppPeminjamRoute
   AppPeminjamanRoute: typeof AppPeminjamanRoute
+  AppPengembalianRoute: typeof AppPengembalianRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
@@ -282,6 +302,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppKategoriRoute: AppKategoriRoute,
   AppPeminjamRoute: AppPeminjamRoute,
   AppPeminjamanRoute: AppPeminjamanRoute,
+  AppPengembalianRoute: AppPengembalianRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
