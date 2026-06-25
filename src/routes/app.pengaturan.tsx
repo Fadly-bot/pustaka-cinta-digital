@@ -40,12 +40,24 @@ function PengaturanPage() {
     queryKey: ["petugas-list"],
     enabled: isAdmin,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: roles, error } = await supabase
         .from("user_roles")
-        .select("user_id, role, profiles!inner(username, nama_lengkap, email)")
+        .select("user_id, role")
         .eq("role", "petugas");
       if (error) throw error;
-      return data;
+      const ids = (roles ?? []).map((r) => r.user_id);
+      if (ids.length === 0) return [];
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, username, nama_lengkap, email")
+        .in("id", ids);
+      const map = new Map((profs ?? []).map((p) => [p.id, p]));
+      return (roles ?? []).map((r) => ({
+        user_id: r.user_id,
+        nama_lengkap: map.get(r.user_id)?.nama_lengkap ?? null,
+        username: map.get(r.user_id)?.username ?? null,
+        email: map.get(r.user_id)?.email ?? null,
+      }));
     },
   });
 
@@ -131,11 +143,11 @@ function PengaturanPage() {
                 </tr>
               </thead>
               <tbody>
-                {petugas.map((p: { user_id: string; profiles: { nama_lengkap: string | null; username: string | null; email: string | null } }) => (
+                {petugas.map((p) => (
                   <tr key={p.user_id} className="border-t">
-                    <td className="px-4 py-3 font-medium">{p.profiles?.nama_lengkap ?? "-"}</td>
-                    <td className="px-4 py-3">{p.profiles?.username ?? "-"}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{p.profiles?.email ?? "-"}</td>
+                    <td className="px-4 py-3 font-medium">{p.nama_lengkap ?? "-"}</td>
+                    <td className="px-4 py-3">{p.username ?? "-"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{p.email ?? "-"}</td>
                     <td className="px-4 py-3 text-right">
                       <Button size="sm" variant="ghost" onClick={() => removeRole(p.user_id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />

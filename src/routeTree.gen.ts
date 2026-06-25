@@ -16,6 +16,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppPengembalianRouteImport } from './routes/app.pengembalian'
+import { Route as AppPengaturanRouteImport } from './routes/app.pengaturan'
 import { Route as AppPeminjamanRouteImport } from './routes/app.peminjaman'
 import { Route as AppPeminjamRouteImport } from './routes/app.peminjam'
 import { Route as AppLaporanRouteImport } from './routes/app.laporan'
@@ -57,6 +58,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppPengembalianRoute = AppPengembalianRouteImport.update({
   id: '/pengembalian',
   path: '/pengembalian',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPengaturanRoute = AppPengaturanRouteImport.update({
+  id: '/pengaturan',
+  path: '/pengaturan',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPeminjamanRoute = AppPeminjamanRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/app/laporan': typeof AppLaporanRoute
   '/app/peminjam': typeof AppPeminjamRoute
   '/app/peminjaman': typeof AppPeminjamanRoute
+  '/app/pengaturan': typeof AppPengaturanRoute
   '/app/pengembalian': typeof AppPengembalianRoute
   '/app/': typeof AppIndexRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/app/laporan': typeof AppLaporanRoute
   '/app/peminjam': typeof AppPeminjamRoute
   '/app/peminjaman': typeof AppPeminjamanRoute
+  '/app/pengaturan': typeof AppPengaturanRoute
   '/app/pengembalian': typeof AppPengembalianRoute
   '/app': typeof AppIndexRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/app/laporan': typeof AppLaporanRoute
   '/app/peminjam': typeof AppPeminjamRoute
   '/app/peminjaman': typeof AppPeminjamanRoute
+  '/app/pengaturan': typeof AppPengaturanRoute
   '/app/pengembalian': typeof AppPengembalianRoute
   '/app/': typeof AppIndexRoute
   '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/app/laporan'
     | '/app/peminjam'
     | '/app/peminjaman'
+    | '/app/pengaturan'
     | '/app/pengembalian'
     | '/app/'
     | '/api/public/seed-admin'
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/app/laporan'
     | '/app/peminjam'
     | '/app/peminjaman'
+    | '/app/pengaturan'
     | '/app/pengembalian'
     | '/app'
     | '/api/public/seed-admin'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/app/laporan'
     | '/app/peminjam'
     | '/app/peminjaman'
+    | '/app/pengaturan'
     | '/app/pengembalian'
     | '/app/'
     | '/api/public/seed-admin'
@@ -253,6 +265,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPengembalianRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/pengaturan': {
+      id: '/app/pengaturan'
+      path: '/pengaturan'
+      fullPath: '/app/pengaturan'
+      preLoaderRoute: typeof AppPengaturanRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/peminjaman': {
       id: '/app/peminjaman'
       path: '/peminjaman'
@@ -312,6 +331,7 @@ interface AppRouteChildren {
   AppLaporanRoute: typeof AppLaporanRoute
   AppPeminjamRoute: typeof AppPeminjamRoute
   AppPeminjamanRoute: typeof AppPeminjamanRoute
+  AppPengaturanRoute: typeof AppPengaturanRoute
   AppPengembalianRoute: typeof AppPengembalianRoute
   AppIndexRoute: typeof AppIndexRoute
 }
@@ -323,6 +343,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppLaporanRoute: AppLaporanRoute,
   AppPeminjamRoute: AppPeminjamRoute,
   AppPeminjamanRoute: AppPeminjamanRoute,
+  AppPengaturanRoute: AppPengaturanRoute,
   AppPengembalianRoute: AppPengembalianRoute,
   AppIndexRoute: AppIndexRoute,
 }
