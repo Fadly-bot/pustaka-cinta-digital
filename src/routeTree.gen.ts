@@ -9,38 +9,241 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as DaftarPeminjamRouteImport } from './routes/daftar-peminjam'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppPengembalianRouteImport } from './routes/app.pengembalian'
+import { Route as AppPengaturanRouteImport } from './routes/app.pengaturan'
+import { Route as AppPeminjamanRouteImport } from './routes/app.peminjaman'
+import { Route as AppPeminjamRouteImport } from './routes/app.peminjam'
+import { Route as AppLaporanRouteImport } from './routes/app.laporan'
+import { Route as AppKategoriRouteImport } from './routes/app.kategori'
+import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
+import { Route as AppBukuRouteImport } from './routes/app.buku'
+import { Route as ApiPublicSeedAdminRouteImport } from './routes/api/public/seed-admin'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DaftarPeminjamRoute = DaftarPeminjamRouteImport.update({
+  id: '/daftar-peminjam',
+  path: '/daftar-peminjam',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPengembalianRoute = AppPengembalianRouteImport.update({
+  id: '/pengembalian',
+  path: '/pengembalian',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPengaturanRoute = AppPengaturanRouteImport.update({
+  id: '/pengaturan',
+  path: '/pengaturan',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPeminjamanRoute = AppPeminjamanRouteImport.update({
+  id: '/peminjaman',
+  path: '/peminjaman',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPeminjamRoute = AppPeminjamRouteImport.update({
+  id: '/peminjam',
+  path: '/peminjam',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLaporanRoute = AppLaporanRouteImport.update({
+  id: '/laporan',
+  path: '/laporan',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppKategoriRoute = AppKategoriRouteImport.update({
+  id: '/kategori',
+  path: '/kategori',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBukuRoute = AppBukuRouteImport.update({
+  id: '/buku',
+  path: '/buku',
+  getParentRoute: () => AppRoute,
+} as any)
+const ApiPublicSeedAdminRoute = ApiPublicSeedAdminRouteImport.update({
+  id: '/api/public/seed-admin',
+  path: '/api/public/seed-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/daftar-peminjam': typeof DaftarPeminjamRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/app/buku': typeof AppBukuRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/kategori': typeof AppKategoriRoute
+  '/app/laporan': typeof AppLaporanRoute
+  '/app/peminjam': typeof AppPeminjamRoute
+  '/app/peminjaman': typeof AppPeminjamanRoute
+  '/app/pengaturan': typeof AppPengaturanRoute
+  '/app/pengembalian': typeof AppPengembalianRoute
+  '/app/': typeof AppIndexRoute
+  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/daftar-peminjam': typeof DaftarPeminjamRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/app/buku': typeof AppBukuRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/kategori': typeof AppKategoriRoute
+  '/app/laporan': typeof AppLaporanRoute
+  '/app/peminjam': typeof AppPeminjamRoute
+  '/app/peminjaman': typeof AppPeminjamanRoute
+  '/app/pengaturan': typeof AppPengaturanRoute
+  '/app/pengembalian': typeof AppPengembalianRoute
+  '/app': typeof AppIndexRoute
+  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/daftar-peminjam': typeof DaftarPeminjamRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/app/buku': typeof AppBukuRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/kategori': typeof AppKategoriRoute
+  '/app/laporan': typeof AppLaporanRoute
+  '/app/peminjam': typeof AppPeminjamRoute
+  '/app/peminjaman': typeof AppPeminjamanRoute
+  '/app/pengaturan': typeof AppPengaturanRoute
+  '/app/pengembalian': typeof AppPengembalianRoute
+  '/app/': typeof AppIndexRoute
+  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/daftar-peminjam'
+    | '/login'
+    | '/reset-password'
+    | '/app/buku'
+    | '/app/dashboard'
+    | '/app/kategori'
+    | '/app/laporan'
+    | '/app/peminjam'
+    | '/app/peminjaman'
+    | '/app/pengaturan'
+    | '/app/pengembalian'
+    | '/app/'
+    | '/api/public/seed-admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/daftar-peminjam'
+    | '/login'
+    | '/reset-password'
+    | '/app/buku'
+    | '/app/dashboard'
+    | '/app/kategori'
+    | '/app/laporan'
+    | '/app/peminjam'
+    | '/app/peminjaman'
+    | '/app/pengaturan'
+    | '/app/pengembalian'
+    | '/app'
+    | '/api/public/seed-admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/daftar-peminjam'
+    | '/login'
+    | '/reset-password'
+    | '/app/buku'
+    | '/app/dashboard'
+    | '/app/kategori'
+    | '/app/laporan'
+    | '/app/peminjam'
+    | '/app/peminjaman'
+    | '/app/pengaturan'
+    | '/app/pengembalian'
+    | '/app/'
+    | '/api/public/seed-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  DaftarPeminjamRoute: typeof DaftarPeminjamRoute
+  LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicSeedAdminRoute: typeof ApiPublicSeedAdminRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/daftar-peminjam': {
+      id: '/daftar-peminjam'
+      path: '/daftar-peminjam'
+      fullPath: '/daftar-peminjam'
+      preLoaderRoute: typeof DaftarPeminjamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +251,113 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pengembalian': {
+      id: '/app/pengembalian'
+      path: '/pengembalian'
+      fullPath: '/app/pengembalian'
+      preLoaderRoute: typeof AppPengembalianRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pengaturan': {
+      id: '/app/pengaturan'
+      path: '/pengaturan'
+      fullPath: '/app/pengaturan'
+      preLoaderRoute: typeof AppPengaturanRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/peminjaman': {
+      id: '/app/peminjaman'
+      path: '/peminjaman'
+      fullPath: '/app/peminjaman'
+      preLoaderRoute: typeof AppPeminjamanRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/peminjam': {
+      id: '/app/peminjam'
+      path: '/peminjam'
+      fullPath: '/app/peminjam'
+      preLoaderRoute: typeof AppPeminjamRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/laporan': {
+      id: '/app/laporan'
+      path: '/laporan'
+      fullPath: '/app/laporan'
+      preLoaderRoute: typeof AppLaporanRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/kategori': {
+      id: '/app/kategori'
+      path: '/kategori'
+      fullPath: '/app/kategori'
+      preLoaderRoute: typeof AppKategoriRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/dashboard': {
+      id: '/app/dashboard'
+      path: '/dashboard'
+      fullPath: '/app/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/buku': {
+      id: '/app/buku'
+      path: '/buku'
+      fullPath: '/app/buku'
+      preLoaderRoute: typeof AppBukuRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/api/public/seed-admin': {
+      id: '/api/public/seed-admin'
+      path: '/api/public/seed-admin'
+      fullPath: '/api/public/seed-admin'
+      preLoaderRoute: typeof ApiPublicSeedAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppBukuRoute: typeof AppBukuRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppKategoriRoute: typeof AppKategoriRoute
+  AppLaporanRoute: typeof AppLaporanRoute
+  AppPeminjamRoute: typeof AppPeminjamRoute
+  AppPeminjamanRoute: typeof AppPeminjamanRoute
+  AppPengaturanRoute: typeof AppPengaturanRoute
+  AppPengembalianRoute: typeof AppPengembalianRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppBukuRoute: AppBukuRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppKategoriRoute: AppKategoriRoute,
+  AppLaporanRoute: AppLaporanRoute,
+  AppPeminjamRoute: AppPeminjamRoute,
+  AppPeminjamanRoute: AppPeminjamanRoute,
+  AppPengaturanRoute: AppPengaturanRoute,
+  AppPengembalianRoute: AppPengembalianRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  DaftarPeminjamRoute: DaftarPeminjamRoute,
+  LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicSeedAdminRoute: ApiPublicSeedAdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
