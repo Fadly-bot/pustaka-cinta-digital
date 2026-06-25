@@ -18,6 +18,7 @@ import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppPengembalianRouteImport } from './routes/app.pengembalian'
 import { Route as AppPeminjamanRouteImport } from './routes/app.peminjaman'
 import { Route as AppPeminjamRouteImport } from './routes/app.peminjam'
+import { Route as AppLaporanRouteImport } from './routes/app.laporan'
 import { Route as AppKategoriRouteImport } from './routes/app.kategori'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppBukuRouteImport } from './routes/app.buku'
@@ -68,6 +69,11 @@ const AppPeminjamRoute = AppPeminjamRouteImport.update({
   path: '/peminjam',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLaporanRoute = AppLaporanRouteImport.update({
+  id: '/laporan',
+  path: '/laporan',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppKategoriRoute = AppKategoriRouteImport.update({
   id: '/kategori',
   path: '/kategori',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/app/buku': typeof AppBukuRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/kategori': typeof AppKategoriRoute
+  '/app/laporan': typeof AppLaporanRoute
   '/app/peminjam': typeof AppPeminjamRoute
   '/app/peminjaman': typeof AppPeminjamanRoute
   '/app/pengembalian': typeof AppPengembalianRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/app/buku': typeof AppBukuRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/kategori': typeof AppKategoriRoute
+  '/app/laporan': typeof AppLaporanRoute
   '/app/peminjam': typeof AppPeminjamRoute
   '/app/peminjaman': typeof AppPeminjamanRoute
   '/app/pengembalian': typeof AppPengembalianRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/app/buku': typeof AppBukuRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/kategori': typeof AppKategoriRoute
+  '/app/laporan': typeof AppLaporanRoute
   '/app/peminjam': typeof AppPeminjamRoute
   '/app/peminjaman': typeof AppPeminjamanRoute
   '/app/pengembalian': typeof AppPengembalianRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/app/buku'
     | '/app/dashboard'
     | '/app/kategori'
+    | '/app/laporan'
     | '/app/peminjam'
     | '/app/peminjaman'
     | '/app/pengembalian'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/app/buku'
     | '/app/dashboard'
     | '/app/kategori'
+    | '/app/laporan'
     | '/app/peminjam'
     | '/app/peminjaman'
     | '/app/pengembalian'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/app/buku'
     | '/app/dashboard'
     | '/app/kategori'
+    | '/app/laporan'
     | '/app/peminjam'
     | '/app/peminjaman'
     | '/app/pengembalian'
@@ -255,6 +267,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPeminjamRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/laporan': {
+      id: '/app/laporan'
+      path: '/laporan'
+      fullPath: '/app/laporan'
+      preLoaderRoute: typeof AppLaporanRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/kategori': {
       id: '/app/kategori'
       path: '/kategori'
@@ -290,6 +309,7 @@ interface AppRouteChildren {
   AppBukuRoute: typeof AppBukuRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppKategoriRoute: typeof AppKategoriRoute
+  AppLaporanRoute: typeof AppLaporanRoute
   AppPeminjamRoute: typeof AppPeminjamRoute
   AppPeminjamanRoute: typeof AppPeminjamanRoute
   AppPengembalianRoute: typeof AppPengembalianRoute
@@ -300,6 +320,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppBukuRoute: AppBukuRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppKategoriRoute: AppKategoriRoute,
+  AppLaporanRoute: AppLaporanRoute,
   AppPeminjamRoute: AppPeminjamRoute,
   AppPeminjamanRoute: AppPeminjamanRoute,
   AppPengembalianRoute: AppPengembalianRoute,
