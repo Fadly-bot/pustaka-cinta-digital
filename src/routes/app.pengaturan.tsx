@@ -69,15 +69,15 @@ function PengaturanPage() {
   email: form.email,
   password: form.password,
   options: {
-    emailRedirectTo: emailRedirectTo:
+    emailRedirectTo:
 `${window.location.origin}/login`,
     data: {
       username: form.username,
       nama_lengkap: form.nama_lengkap,
     },
   },
-},
-    });
+});
+    
     if (error || !data.user) {
       setSaving(false);
       return toast.error(error?.message ?? "Gagal membuat akun");
