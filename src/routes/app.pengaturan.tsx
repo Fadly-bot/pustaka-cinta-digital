@@ -126,18 +126,6 @@ const onAddPetugas = async (
     setSaving(false);
   }
 };
-    
-    if (error || !data.user) {
-      setSaving(false);
-      return toast.error(error?.message ?? "Gagal membuat akun");
-    }
-    const { error: rErr } = await supabase.from("user_roles").insert({ user_id: data.user.id, role: "petugas" } as never);
-    setSaving(false);
-    if (rErr) return toast.error("Akun dibuat tapi role gagal: " + rErr.message);
-    toast.success("Akun petugas berhasil dibuat");
-    setOpen(false);
-    setForm({ email: "", username: "", nama_lengkap: "", password: "" });
-    qc.invalidateQueries({ queryKey: ["petugas-list"] });
 
   const removeRole = async (user_id: string) => {
     const { error } = await supabase.from("user_roles").delete().eq("user_id", user_id).eq("role", "petugas");
