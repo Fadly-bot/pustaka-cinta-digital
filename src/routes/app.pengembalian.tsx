@@ -47,14 +47,13 @@ function PengembalianPage() {
       .from("peminjaman")
       .update({ status: "dikembalikan", tanggal_dikembalikan: format(new Date(), "yyyy-MM-dd") })
       .eq("id", id);
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Buku telah dikembalikan");
-      qc.invalidateQueries({ queryKey: ["pengembalian-list"] });
-      qc.invalidateQueries({ queryKey: ["peminjaman-list"] });
-      qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
-      qc.invalidateQueries({ queryKey: ["buku"] });
-    }
+    if (error) return toast.error(error.message);
+    toast.success("Buku telah dikembalikan");
+    await qc.invalidateQueries({ queryKey: ["pengembalian-list"] });
+    await qc.refetchQueries({ queryKey: ["pengembalian-list"], type: "active" });
+    qc.invalidateQueries({ queryKey: ["peminjaman-list"] });
+    qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
+    qc.invalidateQueries({ queryKey: ["buku"] });
   };
 
   return (
