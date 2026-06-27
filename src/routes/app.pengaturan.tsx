@@ -36,56 +36,34 @@ function PengaturanPage() {
 
   const isAdmin = auth.roles.includes("admin");
 
-const { data: petugas, isLoading } = useQuery({
-  queryKey: ["petugas-list"],
-  enabled: isAdmin,
-  queryFn: async () => {
-    const { data: roles, error } =
-      await supabase
+  const { data: petugas, isLoading, error: listError } = useQuery({
+    queryKey: ["petugas-list"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const { data: roles, error: rolesErr } = await supabase
         .from("user_roles")
-        .select("user_id, role")
+        .select("user_id")
         .eq("role", "petugas");
-    if (error) throw error;
-    const ids =
-      (roles ?? []).map(
-        (r) => r.user_id
-      );
-    if (ids.length === 0)
-      return [];
-    const {
-      data: profs,
-    } = await supabase
-      .from("profiles")
-      .select(
-        "id, username, nama_lengkap, email"
-      )
-      .in(
-        "id",
-        ids
-      );
-    console.log("ROLES",roles);
-    console.log("PROFILES", profs );
-    console.log("IDS", ids);
-    const map =new Map(
-      (profs ?? []).map((p) => [String(p.id), p,])
-    );    
-          
-    return ( roles ?? [] ).map((r) => {      
-       const profile = map.get( String( r.user_id )   
-    );        
-           
-    return {    
-        user_id: r.user_id, 
-        nama_lengkap:profile?.nama_lengkap ??
-          "-",
-        username:profile?.username ??
-          "-",
-        email:profile?.email ??
-        "-",
-      };
-    });
-  },
-});  
+      if (rolesErr) throw rolesErr;
+      const ids = (roles ?? []).map((r) => r.user_id);
+      if (ids.length === 0) return [];
+      const { data: profs, error: profErr } = await supabase
+        .from("profiles")
+        .select("id, username, nama_lengkap, email")
+        .in("id", ids);
+      if (profErr) throw profErr;
+      const map = new Map((profs ?? []).map((p) => [p.id, p]));
+      return ids.map((uid) => {
+        const p = map.get(uid);
+        return {
+          user_id: uid,
+          nama_lengkap: p?.nama_lengkap ?? "-",
+          username: p?.username ?? "-",
+          email: p?.email ?? "-",
+        };
+      });
+    },
+  });
  
 const onAddPetugas = async (
   e: React.FormEvent
