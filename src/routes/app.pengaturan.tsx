@@ -66,12 +66,16 @@ function PengaturanPage() {
     if (form.password.length < 8) return toast.error("Password minimal 8 karakter");
     setSaving(true);
     const { data, error } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/login`,
-        data: { username: form.username, nama_lengkap: form.nama_lengkap },
-      },
+  email: form.email,
+  password: form.password,
+  options: {
+    emailRedirectTo: import.meta.env.VITE_SITE_URL + "/login",
+    data: {
+      username: form.username,
+      nama_lengkap: form.nama_lengkap,
+    },
+  },
+},
     });
     if (error || !data.user) {
       setSaving(false);
