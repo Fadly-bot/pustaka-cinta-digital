@@ -38,8 +38,8 @@ function PengaturanPage() {
 
 const { data: petugas, isloading } = useQuery({
     queryKey: ["petugas-list"],
-    enable: isAdmin,
-    queryFn: async () => {},
+    enabled: isAdmin,
+    queryFn: async () => {
         const { data: role, error } = await supabase
             .from("user_roles"),
             .select("user_id, role"),
@@ -57,6 +57,7 @@ const { data: petugas, isloading } = useQuery({
         const map = new Map(
             (profs ?? []).map((p) => [String(p.id), p])
         );
+    };
 });
 
 return (roles ?? []).map((r) => {
