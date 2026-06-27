@@ -39,7 +39,7 @@ function PengaturanPage() {
 const { data: petugas, isloading } = useQuery({
     queryKey: ["petugas-list"],
     enable: isAdmin,
-    queryFn: async () => {}
+    queryFn: async () => {},
         const { data: role, error } = await supabase
             .from("user_roles"),
             .select("user_id, role"),
