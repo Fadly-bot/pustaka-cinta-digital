@@ -130,11 +130,10 @@ const onAddPetugas = async (
 
   const removeRole = async (user_id: string) => {
     const { error } = await supabase.from("user_roles").delete().eq("user_id", user_id).eq("role", "petugas");
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Role petugas dicabut");
-      qc.invalidateQueries({ queryKey: ["petugas-list"] });
-    }
+    if (error) return toast.error(error.message);
+    toast.success("Role petugas dicabut");
+    await qc.invalidateQueries({ queryKey: ["petugas-list"] });
+    await qc.refetchQueries({ queryKey: ["petugas-list"], type: "active" });
   };
 
   const saveProfil = (e: React.FormEvent) => {
