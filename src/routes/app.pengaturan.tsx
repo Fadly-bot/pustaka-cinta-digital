@@ -58,7 +58,7 @@ function PengaturanPage() {
   (profs ?? []).map((p) => [
     String(p.id),
     p,
-  ])
+  ]),
 );
 
 return (roles ?? []).map((r) => {
