@@ -138,7 +138,6 @@ const onAddPetugas = async (
     setOpen(false);
     setForm({ email: "", username: "", nama_lengkap: "", password: "" });
     qc.invalidateQueries({ queryKey: ["petugas-list"] });
-  };
 
   const removeRole = async (user_id: string) => {
     const { error } = await supabase.from("user_roles").delete().eq("user_id", user_id).eq("role", "petugas");
