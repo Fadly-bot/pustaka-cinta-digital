@@ -115,11 +115,8 @@ const onAddPetugas = async (
       password: "",
     });
 
-    qc.invalidateQueries({
-      queryKey: [
-        "petugas-list",
-      ],
-    });
+    await qc.invalidateQueries({ queryKey: ["petugas-list"] });
+    await qc.refetchQueries({ queryKey: ["petugas-list"] });
 
   } catch (err: any) {
     toast.error(
