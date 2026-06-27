@@ -1,1 +1,4 @@
+
+[functions.create-petugas]
+verify_jwt = true
 project_id = "vhlewdjfiyxhgeftdtrg"
