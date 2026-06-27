@@ -54,29 +54,40 @@ function PengaturanPage() {
       console.log("ROLES", roles);
       console.log("PROFILES", profs);
       console.log("IDS", ids);
-      const map = new Map((profs ?? []).map((p) => [String(p.id, p),p]));
-      return (roles ?? []).map((r) => {
-        const p =
-        map.get(
-          String(r.user.id)
-        );
-        return {
-          user_id:
-            r.user_id,
-          nama_lengkap:
-            p?.nama_lengkap??
-            "-",
-          username:
-            p?.username ??
-            "-",
-          email:
-            p?.email ??
-            "-",
-        };
-      });
-    },
-  });
+      const map = new Map(
+  (profs ?? []).map((p) => [
+    String(p.id),
+    p,
+  ])
+);
 
+return (roles ?? []).map((r) => {
+  const profile =
+    map.get(
+      String(r.user_id)
+    );
+
+  return {
+    user_id:
+      r.user_id,
+
+    nama_lengkap:
+      profile?.nama_lengkap ??
+      "-",
+
+    username:
+      profile?.username ??
+      "-",
+
+    email:
+      profile?.email ??
+      "-",
+  };
+});
+      console.log("ROLES", roles);
+console.log("PROFILES", profs);
+console.log("MAP", map);
+      
 const onAddPetugas = async (
   e: React.FormEvent
 ) => {
