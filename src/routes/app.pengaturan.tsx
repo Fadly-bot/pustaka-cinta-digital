@@ -69,7 +69,8 @@ function PengaturanPage() {
   email: form.email,
   password: form.password,
   options: {
-    emailRedirectTo: import.meta.env.VITE_SITE_URL + "/login",
+    emailRedirectTo: emailRedirectTo:
+`${window.location.origin}/login`,
     data: {
       username: form.username,
       nama_lengkap: form.nama_lengkap,
