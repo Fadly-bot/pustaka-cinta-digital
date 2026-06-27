@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { Plus, Trash2, Loader2, Pencil, Search } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/kategori")({
@@ -18,6 +18,9 @@ function KategoriPage() {
   const qc = useQueryClient();
   const [nama, setNama] = useState("");
   const [saving, setSaving] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editNama, setEditNama] = useState("");
+  const [search, setSearch] = useState("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["kategori_buku"],
@@ -28,6 +31,11 @@ function KategoriPage() {
     },
   });
 
+  const refresh = async () => {
+    await qc.invalidateQueries({ queryKey: ["kategori_buku"] });
+    await qc.refetchQueries({ queryKey: ["kategori_buku"], type: "active" });
+  };
+
   const onAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nama.trim()) return;
@@ -37,29 +45,55 @@ function KategoriPage() {
     if (error) return toast.error(error.message);
     setNama("");
     toast.success("Kategori ditambahkan");
-    qc.invalidateQueries({ queryKey: ["kategori_buku"] });
+    await refresh();
+  };
+
+  const onSaveEdit = async (id: string) => {
+    if (!editNama.trim()) return toast.error("Nama tidak boleh kosong");
+    const { error } = await supabase
+      .from("kategori_buku")
+      .update({ nama_kategori: editNama.trim() })
+      .eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Kategori diperbarui");
+    setEditId(null);
+    setEditNama("");
+    await refresh();
   };
 
   const onDelete = async (id: string) => {
-    const { error } = await supabase.from("kategori_buku").delete().eq("id", id);
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Kategori dihapus");
-      qc.invalidateQueries({ queryKey: ["kategori_buku"] });
+    const { count } = await supabase
+      .from("buku")
+      .select("id", { count: "exact", head: true })
+      .eq("kategori_id", id);
+    if ((count ?? 0) > 0) {
+      return toast.error("Tidak bisa hapus: kategori masih dipakai oleh buku");
     }
+    const { error } = await supabase.from("kategori_buku").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Kategori dihapus");
+    await refresh();
   };
+
+  const filtered = (data ?? []).filter((k) =>
+    !search.trim() ? true : k.nama_kategori.toLowerCase().includes(search.toLowerCase()),
+  );
 
   return (
     <div>
       <PageHeader title="Kategori Buku" description="Atur kategori untuk pengelompokan buku." />
       <Card className="mb-4">
         <CardContent className="pt-6">
-          <form onSubmit={onAdd} className="flex gap-2">
+          <form onSubmit={onAdd} className="flex flex-col sm:flex-row gap-2">
             <Input placeholder="Nama kategori baru..." value={nama} onChange={(e) => setNama(e.target.value)} />
             <Button type="submit" disabled={saving}>
-              <Plus className="h-4 w-4" /> Tambah
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Tambah
             </Button>
           </form>
+          <div className="relative mt-3">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Cari kategori..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          </div>
         </CardContent>
       </Card>
       <Card>
@@ -68,14 +102,44 @@ function KategoriPage() {
             <div className="flex items-center justify-center py-10">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
-          ) : data && data.length > 0 ? (
+          ) : filtered.length > 0 ? (
             <ul className="divide-y">
-              {data.map((k) => (
-                <li key={k.id} className="flex items-center justify-between px-4 py-3">
-                  <span className="text-sm">{k.nama_kategori}</span>
-                  <Button size="sm" variant="ghost" onClick={() => onDelete(k.id)} aria-label={`Hapus kategori ${k.nama_kategori}`}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+              {filtered.map((k) => (
+                <li key={k.id} className="flex items-center justify-between px-4 py-3 gap-2">
+                  {editId === k.id ? (
+                    <>
+                      <Input
+                        autoFocus
+                        value={editNama}
+                        onChange={(e) => setEditNama(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") onSaveEdit(k.id);
+                          if (e.key === "Escape") setEditId(null);
+                        }}
+                        className="flex-1"
+                      />
+                      <Button size="sm" onClick={() => onSaveEdit(k.id)}>Simpan</Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEditId(null)}>Batal</Button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-sm flex-1">{k.nama_kategori}</span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setEditId(k.id);
+                          setEditNama(k.nama_kategori);
+                        }}
+                        aria-label={`Edit kategori ${k.nama_kategori}`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => onDelete(k.id)} aria-label={`Hapus kategori ${k.nama_kategori}`}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>

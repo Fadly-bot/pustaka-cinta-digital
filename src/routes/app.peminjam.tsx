@@ -15,7 +15,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, Search, Users, Loader2, Eye } from "lucide-react";
+import { Plus, Search, Users, Loader2, Eye, Pencil, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -29,6 +39,9 @@ function PeminjamPage() {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ nama: "", no_identitas: "", no_hp: "", alamat: "", email: "" });
 
   const { data, isLoading } = useQuery({
@@ -56,22 +69,63 @@ function PeminjamPage() {
     },
   });
 
+  const refresh = async () => {
+    await qc.invalidateQueries({ queryKey: ["peminjam"] });
+    await qc.refetchQueries({ queryKey: ["peminjam"], type: "active" });
+    qc.invalidateQueries({ queryKey: ["peminjam-options"] });
+    qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
+  };
+
+  const openCreate = () => {
+    setEditId(null);
+    setForm({ nama: "", no_identitas: "", no_hp: "", alamat: "", email: "" });
+    setOpen(true);
+  };
+
+  const openEdit = (p: { id: string; nama: string; no_identitas: string | null; no_hp: string | null; alamat: string | null; email: string | null }) => {
+    setEditId(p.id);
+    setForm({
+      nama: p.nama,
+      no_identitas: p.no_identitas ?? "",
+      no_hp: p.no_hp ?? "",
+      alamat: p.alamat ?? "",
+      email: p.email ?? "",
+    });
+    setOpen(true);
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.nama.trim()) return toast.error("Nama wajib diisi");
-    const { error } = await supabase.from("peminjam").insert({
+    setSaving(true);
+    const payload = {
       nama: form.nama.trim(),
       no_identitas: form.no_identitas || null,
       no_hp: form.no_hp || null,
       alamat: form.alamat || null,
       email: form.email || null,
-    } as never);
+    };
+    const { error } = editId
+      ? await supabase.from("peminjam").update(payload).eq("id", editId)
+      : await supabase.from("peminjam").insert(payload as never);
+    setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Peminjam ditambahkan");
+    toast.success(editId ? "Peminjam diperbarui" : "Peminjam ditambahkan");
     setOpen(false);
+    setEditId(null);
     setForm({ nama: "", no_identitas: "", no_hp: "", alamat: "", email: "" });
-    qc.invalidateQueries({ queryKey: ["peminjam"] });
-    qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
+    await refresh();
+  };
+
+  const onDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await supabase.from("peminjam").delete().eq("id", deleteId);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Peminjam dihapus");
+      await refresh();
+    }
+    setDeleteId(null);
   };
 
   return (
@@ -80,7 +134,7 @@ function PeminjamPage() {
         title="Data Peminjam"
         description="Daftar masyarakat/siswa yang terdaftar sebagai peminjam."
         actions={
-          <Button onClick={() => setOpen(true)}>
+          <Button onClick={openCreate}>
             <Plus className="h-4 w-4" /> Tambah Peminjam
           </Button>
         }
@@ -126,9 +180,15 @@ function PeminjamPage() {
                         {p.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right">
-                      <Button size="sm" variant="ghost" onClick={() => setDetailId(p.id)}>
-                        <Eye className="h-4 w-4" /> Histori
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <Button size="sm" variant="ghost" onClick={() => setDetailId(p.id)} aria-label={`Histori ${p.nama}`}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => openEdit(p)} aria-label={`Edit ${p.nama}`}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setDeleteId(p.id)} aria-label={`Hapus ${p.nama}`}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </td>
                   </tr>
@@ -142,7 +202,7 @@ function PeminjamPage() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Tambah Peminjam</DialogTitle>
+            <DialogTitle>{editId ? "Edit Peminjam" : "Tambah Peminjam"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-3">
             <div className="space-y-2">
@@ -169,11 +229,28 @@ function PeminjamPage() {
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Batal</Button>
-              <Button type="submit">Simpan</Button>
+              <Button type="submit" disabled={saving}>
+                {saving && <Loader2 className="h-4 w-4 animate-spin" />} Simpan
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus peminjam?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Data peminjam akan dihapus. Tindakan ini tidak bisa dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={onDelete}>Hapus</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={!!detailId} onOpenChange={(o) => !o && setDetailId(null)}>
         <DialogContent className="max-w-2xl">

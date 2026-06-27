@@ -113,7 +113,8 @@ function PeminjamanPage() {
     setPeminjamId("");
     setItems([]);
     setCatatan("");
-    qc.invalidateQueries({ queryKey: ["peminjaman-list"] });
+    await qc.invalidateQueries({ queryKey: ["peminjaman-list"] });
+    await qc.refetchQueries({ queryKey: ["peminjaman-list"], type: "active" });
     qc.invalidateQueries({ queryKey: ["buku-options"] });
     qc.invalidateQueries({ queryKey: ["buku"] });
     qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
