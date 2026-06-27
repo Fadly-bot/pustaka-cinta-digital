@@ -62,37 +62,71 @@ function PengaturanPage() {
   });
 
   const onAddPetugas = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (form.password.length < 8) return toast.error("Password minimal 8 karakter");
+  e.preventDefault();
+
+  if (form.password.length < 8) {
+    return toast.error("Password minimal 8 karakter");
+  }
+
+  try {
     setSaving(true);
-    const { data, error } = await supabase.auth.signUp({
-  email: form.email,
-  password: form.password,
-  options: {
-    emailRedirectTo: `${window.location.origin}/login`,
-    data: {
-      username: form.username,
-      nama_lengkap: form.nama_lengkap,
-    },
-  },
-});
 
-if (error) {
-  throw error;
-}
+    const { data, error } =
+      await supabase.functions.invoke(
+        "create-petugas",
+        {
+          body: {
+            users: [
+              {
+                email: form.email,
+                password: form.password,
+                username: form.username,
+                nama_lengkap: form.nama_lengkap,
+              },
+            ],
+          },
+        }
+      );
 
-if (data?.user) {
-  await supabase.from("profiles").upsert({
-    id: data.user.id,
-    username: form.username,
-    nama_lengkap: form.nama_lengkap,
-  });
+    if (error) {
+      throw error;
+    }
 
-  await supabase.from("user_roles").upsert({
-    user_id: data.user.id,
-    role: "petugas",
-  });
-}
+    const hasil = data?.[0];
+
+    if (!hasil?.success) {
+      throw new Error(
+        hasil?.error ??
+        "Gagal membuat akun"
+      );
+    }
+
+    toast.success(
+      "Akun petugas berhasil dibuat"
+    );
+
+    setOpen(false);
+
+    setForm({
+      email: "",
+      username: "",
+      nama_lengkap: "",
+      password: "",
+    });
+
+    qc.invalidateQueries({
+      queryKey: ["petugas-list"],
+    });
+
+  } catch (err: any) {
+    toast.error(
+      err?.message ??
+      "Terjadi kesalahan"
+    );
+  } finally {
+    setSaving(false);
+  }
+};
     
     if (error || !data.user) {
       setSaving(false);
