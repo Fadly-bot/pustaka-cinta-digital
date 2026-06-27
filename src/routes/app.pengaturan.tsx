@@ -36,57 +36,57 @@ function PengaturanPage() {
 
   const isAdmin = auth.roles.includes("admin");
 
-const { data: petugas, isloading } = useQuery({
-    queryKey: ["petugas-list"],
-    enabled: isAdmin,
-    queryFn: async () => {
-        const { data: role, error } = await supabase
-            .from("user_roles"),
-            .select("user_id, role"),
-            .eq("role", "petugas");
-        if (error)  throw error;
-        const ids = (role ?? []).map((r) => r.user_id);
-        if (ids.length === 0) return [];
-        const {data: profs} = await supabase
-            .from("PROFILES"),
-            .select("id, username, nama_lengkap, email"),
-            .in("id", ids);
-        console.log("ROLES", roles);
-        console.log("PROFILES", profs);
-        console.log("IDS", ids);
-        const map = new Map(
-            (profs ?? []).map((p) => [String(p.id), p])
-        );
-    };
-});
-
-return (roles ?? []).map((r) => {
-  const profile =
-    map.get(
-      String(r.user_id)
-    );
-
-  return {
-    user_id:
-      r.user_id,
-
-    nama_lengkap:
-      profile?.nama_lengkap ??
-      "-",
-
-    username:
-      profile?.username ??
-      "-",
-
-    email:
-      profile?.email ??
-      "-",
-  };
-});
-      console.log("ROLES", roles);
-console.log("PROFILES", profs);
-console.log("MAP", map);
-      
+const { data: petugas, isLoading } = useQuery({
+  queryKey: ["petugas-list"],
+  enabled: isAdmin,
+  queryFn: async () => {
+    const { data: roles, error } =
+      await supabase
+        .from("user_roles")
+        .select("user_id, role")
+        .eq("role", "petugas");
+    if (error) throw error;
+    const ids =
+      (roles ?? []).map(
+        (r) => r.user_id
+      );
+    if (ids.length === 0)
+      return [];
+    const {
+      data: profs,
+    } = await supabase
+      .from("profiles")
+      .select(
+        "id, username, nama_lengkap, email"
+      )
+      .in(
+        "id",
+        ids
+      );
+    console.log("ROLES",roles);
+    console.log("PROFILES", profs );
+    console.log("IDS", ids);
+    const map =new Map(
+      (profs ?? []).map((p) => [String(p.id), p,])
+    );    
+          
+    return ( roles ?? [] ).map((r) => {      
+       const profile = map.get( String( r.user_id )   
+    );        
+           
+    return {    
+        user_id: r.user_id, 
+        nama_lengkap:profile?.nama_lengkap ??
+          "-",
+        username:profile?.username ??
+          "-",
+        email:profile?.email ??
+        "-",
+      };
+    });
+  },
+});  
+ 
 const onAddPetugas = async (
   e: React.FormEvent
 ) => {
