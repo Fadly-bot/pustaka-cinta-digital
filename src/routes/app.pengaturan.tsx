@@ -51,13 +51,29 @@ function PengaturanPage() {
         .from("profiles")
         .select("id, username, nama_lengkap, email")
         .in("id", ids);
-      const map = new Map((profs ?? []).map((p) => [p.id, p]));
-      return (roles ?? []).map((r) => ({
-        user_id: r.user_id,
-        nama_lengkap: map.get(r.user_id)?.nama_lengkap ?? null,
-        username: map.get(r.user_id)?.username ?? null,
-        email: map.get(r.user_id)?.email ?? null,
-      }));
+      console.log("ROLES", roles);
+      console.log("PROFILES", profs);
+      console.log("IDS", ids);
+      const map = new Map((profs ?? []).map((p) => [String(p.id, p),p]));
+      return (roles ?? []).map((r) => {
+        const p =
+        map.get(
+          String(r.user.id)
+        );
+        return {
+          user_id:
+            r.user_id,
+          nama_lengkap:
+            p?.nama_lengkap??
+            "-",
+          username:
+            p?.username ??
+            "-",
+          email:
+            p?.email ??
+            "-",
+        };
+      });
     },
   });
 
