@@ -61,43 +61,56 @@ function PengaturanPage() {
     },
   });
 
-  const onAddPetugas = async (e: React.FormEvent) => {
+const onAddPetugas = async (
+  e: React.FormEvent
+) => {
   e.preventDefault();
 
   if (form.password.length < 8) {
-    return toast.error("Password minimal 8 karakter");
+    toast.error(
+      "Password minimal 8 karakter"
+    );
+    return;
   }
 
   try {
     setSaving(true);
 
-    const { data, error } =
+    const result =
       await supabase.functions.invoke(
         "create-petugas",
         {
           body: {
             users: [
               {
-                email: form.email,
-                password: form.password,
-                username: form.username,
-                nama_lengkap: form.nama_lengkap,
+                email:
+                  form.email,
+
+                password:
+                  form.password,
+
+                username:
+                  form.username,
+
+                nama_lengkap:
+                  form.nama_lengkap,
               },
             ],
           },
         }
       );
 
-    if (error) {
-      throw error;
+    if (result.error) {
+      throw result.error;
     }
 
-    const hasil = data?.[0];
+    const hasil =
+      result.data?.[0];
 
     if (!hasil?.success) {
       throw new Error(
         hasil?.error ??
-        "Gagal membuat akun"
+          "Gagal membuat akun"
       );
     }
 
@@ -114,14 +127,16 @@ function PengaturanPage() {
       password: "",
     });
 
-    qc.invalidateQueries({
-      queryKey: ["petugas-list"],
+    await qc.invalidateQueries({
+      queryKey: [
+        "petugas-list",
+      ],
     });
 
   } catch (err: any) {
     toast.error(
       err?.message ??
-      "Terjadi kesalahan"
+        "Terjadi kesalahan"
     );
   } finally {
     setSaving(false);
