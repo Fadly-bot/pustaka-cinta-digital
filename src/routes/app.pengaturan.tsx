@@ -175,6 +175,8 @@ const onAddPetugas = async (
         <CardContent className="p-0 overflow-x-auto">
           {isLoading ? (
             <div className="flex items-center justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+          ) : listError ? (
+            <p className="text-center py-10 text-sm text-destructive">Gagal memuat: {(listError as Error).message}</p>
           ) : !petugas || petugas.length === 0 ? (
             <p className="text-center py-10 text-sm text-muted-foreground">Belum ada petugas.</p>
           ) : (
