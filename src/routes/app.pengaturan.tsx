@@ -83,15 +83,9 @@ const onAddPetugas = async (
           body: {
             users: [
               {
-                email:
-                  form.email,
-
-                password:
-                  form.password,
-
-                username:
-                  form.username,
-
+                email: form.email,
+                password: form.password,
+                username: form.username,
                 nama_lengkap:
                   form.nama_lengkap,
               },
@@ -102,16 +96,6 @@ const onAddPetugas = async (
 
     if (result.error) {
       throw result.error;
-    }
-
-    const hasil =
-      result.data?.[0];
-
-    if (!hasil?.success) {
-      throw new Error(
-        hasil?.error ??
-          "Gagal membuat akun"
-      );
     }
 
     toast.success(
@@ -127,7 +111,7 @@ const onAddPetugas = async (
       password: "",
     });
 
-    await qc.invalidateQueries({
+    qc.invalidateQueries({
       queryKey: [
         "petugas-list",
       ],
@@ -136,7 +120,7 @@ const onAddPetugas = async (
   } catch (err: any) {
     toast.error(
       err?.message ??
-        "Terjadi kesalahan"
+      "Terjadi kesalahan"
     );
   } finally {
     setSaving(false);
