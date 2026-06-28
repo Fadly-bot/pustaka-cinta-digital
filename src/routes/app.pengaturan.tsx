@@ -62,78 +62,112 @@ function PengaturanPage() {
    }     
  });         
 
-const onAddPetugas = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (form.password.length < 8) {
-    toast.error("Password minimal 8 karakter");
-    return;
-  }
+const onAddPetugas = async (
+e: React.FormEvent
+) => {
 
-  try {
-    setSaving(true);
+e.preventDefault();
 
-    // 1. JALANKAN EDGE FUNCTION TERLEBIH DAHULU
-    const result = await supabase.functions.invoke(
-      "create-petugas",
-      {
-        body: {
-          users: [
-            {
-              email: form.email,
-              password: form.password,
-              username: form.username,
-              nama_lengkap: form.nama_lengkap,
-            },
-          ],
-        },
-      }
-    ); // <-- Kurung tutup invoke selesai di sini
+if (
+form.password.length < 8
+) {
+toast.error(
+"Password minimal 8 karakter"
+);
+return;
+}
 
-    if (result.error) {
-      throw result.error;
-    }
+try {
 
-    // 2. DI SINI TEMPATNYA: KODE PROFILES UPSERT ANDA
-    const { error: upsertError } = await supabase
-      .from("profiles")
-      .upsert({
-        id: data.user.id,
-        email: form.email,
-        username: form.username,
-        nama_lengkap: form.nama_lengkap
-      });
+setSaving(
+true
+);
 
-    if (upsertError) throw upsertError;
+const {
+data,
+error
+} =
+await supabase.functions.invoke(
+"create-petugas",
+{
+body:{
+users:[
+{
+email:
+form.email,
 
-    // 3. DI SINI TEMPATNYA: KODE USER ROLES INSERT ANDA
-    const { error: roleError } = await supabase
-      .from("user_roles")
-      .insert({
-        user_id: data.user.id,
-        role: "petugas"
-      });
+password:
+form.password,
 
-    if (roleError) throw roleError;
+username:
+form.username,
 
-    // 4. JIKA SEMUA BERHASIL, RESET FORM DAN CLOSE MODAL
-    toast.success("Akun petugas berhasil dibuat");
-    await qc.invalidateQueries({
-      queryKey: ["petugas-list"]
-    });
+nama_lengkap:
+form.nama_lengkap
+}
+]
+}
+}
+);
 
-    setOpen(false);
-    setForm({
-      email: "",
-      username: "",
-      nama_lengkap: "",
-      password: "",
-    });
+if (
+error
+)
+throw error;
 
-  } catch (err: any) {
-    toast.error(err?.message ?? "Terjadi kesalahan");
-  } finally {
-    setSaving(false);
-  }
+/*
+JIKA EDGE FUNCTION
+SUDAH MENYIMPAN
+KE PROFILES +
+USER_ROLES
+TIDAK PERLU
+UPSERT LAGI
+*/
+
+toast.success(
+"Akun petugas berhasil dibuat"
+);
+
+await qc.invalidateQueries({
+queryKey:[
+"petugas-list"
+]
+});
+
+setOpen(
+false
+);
+
+setForm({
+email:"",
+username:"",
+nama_lengkap:"",
+password:""
+});
+
+}
+catch(
+err:any
+){
+
+console.error(
+err
+);
+
+toast.error(
+err?.message ??
+"Gagal membuat petugas"
+);
+
+}
+finally{
+
+setSaving(
+false
+);
+
+}
+
 };
 
   const removeRole = async (user_id: string) => {
