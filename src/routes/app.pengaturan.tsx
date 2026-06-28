@@ -69,11 +69,9 @@ const onAddPetugas = async (e: React.FormEvent) => {
       "Password minimal 8 karakter"
     );
     return;
-  };
+  }
+  setSaving(true);
   try
-  
-  
-
    {
     setSaving(true);
 
