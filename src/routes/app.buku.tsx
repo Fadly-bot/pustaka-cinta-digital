@@ -311,7 +311,7 @@ function BukuPage() {
                   <SelectContent>
                     {kategori?.map((k) => (
                       <SelectItem key={k.id} value={k.id}>
-                        {k.nama}
+                        {k.nama_kategori}
                       </SelectItem>
                     ))}
                   </SelectContent>
