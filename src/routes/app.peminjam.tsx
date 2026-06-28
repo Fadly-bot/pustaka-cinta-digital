@@ -105,17 +105,60 @@ function PeminjamPage() {
       alamat: form.alamat || null,
       email: form.email || null,
     };
-    const { error } = editId
-      ? await supabase.from("peminjam").update(payload).eq("id", editId)
-      : await supabase.from("peminjam").insert(payload as never);
-    setSaving(false);
-    if (error) return toast.error(error.message);
-    toast.success(editId ? "Peminjam diperbarui" : "Peminjam ditambahkan");
+    const save = async () => {
+  setSaving(true);
+
+  try {
+    console.log("PAYLOAD", payload);
+
+    const result = editId
+      ? await supabase
+          .from("peminjam")
+          .update(payload)
+          .eq("id", editId)
+          .select()
+
+      : await supabase
+          .from("peminjam")
+          .insert([payload])
+          .select();
+
+    console.log(result);
+
+    if (result.error)
+      throw result.error;
+
+    toast.success(
+      editId
+        ? "Peminjam diperbarui"
+        : "Peminjam ditambahkan"
+    );
+
     setOpen(false);
+
     setEditId(null);
-    setForm({ nama: "", no_identitas: "", no_hp: "", alamat: "", email: "" });
+
+    setForm({
+      nama:"",
+      no_identitas:"",
+      no_hp:"",
+      alamat:"",
+      email:""
+    });
+
     await refresh();
-  };
+
+  } catch (e:any) {
+    console.error(e);
+
+    toast.error(
+      e.message
+    );
+
+  } finally {
+    setSaving(false);
+  }
+};
 
   const onDelete = async () => {
     if (!deleteId) return;
