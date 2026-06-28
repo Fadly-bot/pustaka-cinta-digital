@@ -120,7 +120,7 @@ function PeminjamPage() {
 
       : await supabase
           .from("peminjam")
-          .insert([payload])
+          .insert([payload as any])
           .select();
 
     console.log(result);
