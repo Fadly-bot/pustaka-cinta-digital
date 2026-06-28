@@ -106,7 +106,7 @@ const onAddPetugas = async (
         .insert({
           user_id: data.user.id,
           role: "petugas"
-        });
+        }),
          )
           
         };
