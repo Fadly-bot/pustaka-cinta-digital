@@ -41,20 +41,21 @@ const {
   isLoading,
   error: listError
 } = useQuery({
-  queryKey: ["petugas-list"],
-  enabled: isAdmin,
+  queryKey:["petugas-list"],
+  enabled:isAdmin,
 
   queryFn: async () => {
 
     const {
       data,
       error
-    } = await supabase
+    } =
+    await supabase
       .from("user_roles")
       .select(`
         user_id,
         role,
-        profiles!user_roles_user_id_fkey(
+        profiles(
           id,
           email,
           username,
@@ -69,31 +70,17 @@ const {
     if (error)
       throw error;
 
+    // TAMBAH DI SINI
     console.log(
-      "PETUGAS",
-      data
+      "PETUGAS RAW",
+      JSON.stringify(
+        data,
+        null,
+        2
+      )
     );
 
-    return (
-      data ?? []
-    ).map(
-      (r:any) => ({
-        user_id:
-          r.user_id,
-
-        nama_lengkap:
-          r.profiles?.nama_lengkap ??
-          "-",
-
-        username:
-          r.profiles?.username ??
-          "-",
-
-        email:
-          r.profiles?.email ??
-          "-"
-      })
-    );
+    return data ?? [];
   }
 });
   
