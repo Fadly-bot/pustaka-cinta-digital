@@ -46,6 +46,7 @@ const {
 
   queryFn: async () => {
 
+    // ambil semua user petugas
     const {
       data: roles,
       error: roleErr
@@ -57,15 +58,16 @@ const {
     if (roleErr)
       throw roleErr;
 
-    console.log("ROLES", roles);
-
     const ids =
       (roles ?? [])
       .map((r:any) => r.user_id);
 
-    if (ids.length === 0)
+    console.log("IDS", ids);
+
+    if (!ids.length)
       return [];
 
+    // ambil profil berdasarkan id
     const {
       data: profiles,
       error: profErr
@@ -76,20 +78,24 @@ const {
         email,
         username,
         nama_lengkap
-      `)
-      .in("id", ids);
+      `);
 
     if (profErr)
       throw profErr;
 
     console.log("PROFILES", profiles);
 
-    return profiles ?? [];
-  },
-});
+    const result =
+      (profiles ?? [])
+      .filter((p:any)=>
+        ids.includes(p.id)
+      );
 
-// WAJIB DI LUAR useQuery
-console.log("PETUGAS FINAL", petugas);
+    console.log("PETUGAS FINAL", result);
+
+    return result;
+  }
+});
   
 const onAddPetugas = async (
 e: React.FormEvent
