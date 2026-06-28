@@ -41,64 +41,61 @@ const {
   isLoading,
   error: listError
 } = useQuery({
-  queryKey:["petugas-list"],
-  enabled:isAdmin,
+  queryKey: ["petugas-list"],
+  enabled: isAdmin,
 
   queryFn: async () => {
 
-const {
-data,
-error
-} =
-await supabase
-.from("user_roles")
-.select(`
-user_id,
-role,
-profiles!user_roles_user_id_fkey(
-id,
-email,
-username,
-nama_lengkap
-)
-`)
-.eq(
-"role",
-"petugas"
-);
+    const {
+      data,
+      error
+    } = await supabase
+      .from("user_roles")
+      .select(`
+        user_id,
+        role,
+        profiles!user_roles_user_id_fkey(
+          id,
+          email,
+          username,
+          nama_lengkap
+        )
+      `)
+      .eq(
+        "role",
+        "petugas"
+      );
 
-if(error)
-throw error;
+    if (error)
+      throw error;
 
-console.log(
-"PETUGAS",
-data
-);
+    console.log(
+      "PETUGAS",
+      data
+    );
 
-return (
-data ?? []
-).map(
-(r:any)=>({
+    return (
+      data ?? []
+    ).map(
+      (r:any) => ({
+        user_id:
+          r.user_id,
 
-user_id:
-r.user_id,
+        nama_lengkap:
+          r.profiles?.nama_lengkap ??
+          "-",
 
-nama_lengkap:
-r.profiles?.nama_lengkap
-?? "-",
+        username:
+          r.profiles?.username ??
+          "-",
 
-username:
-r.profiles?.username
-?? "-",
-
-email:
-r.profiles?.email
-?? "-"
-
-})
-);
-
-}
+        email:
+          r.profiles?.email ??
+          "-"
+      })
+    );
+  }
+});
   
 const onAddPetugas = async (
 e: React.FormEvent
