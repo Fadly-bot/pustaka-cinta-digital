@@ -41,26 +41,40 @@ const {
   isLoading,
   error: listError,
 } = useQuery({
-  queryKey: ["petugas-list"],
-  enabled: isAdmin,
+  queryKey:["petugas-list"],
+  enabled:isAdmin,
 
-  queryFn: async () => {
+  queryFn: async()=>{
 
-    const {
-      data: roles,
-      error: roleErr
-    } = await supabase
+    const { data: roles, error } =
+      await supabase
       .from("user_roles")
       .select("*")
-      .eq("role", "petugas");
+      .eq("role","petugas");
 
-    console.log("ROLE ERROR", roleErr);
-    console.log("ROLES", roles);
+    if(error)
+      throw error;
 
-    if (roleErr)
-      throw roleErr;
+    const ids =
+      (roles ?? [])
+      .map((r:any)=>r.user_id);
 
-    return [];
+    if(ids.length===0)
+      return [];
+
+    const {
+      data: profiles,
+      error: profErr
+    } =
+      await supabase
+      .from("profiles")
+      .select("id,email,username,nama_lengkap")
+      .in("id", ids);
+
+    if(profErr)
+      throw profErr;
+
+    return profiles ?? [];
   }
 });
   
