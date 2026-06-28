@@ -82,6 +82,7 @@ const {
           "-"
       }));
   }
+  console.log("PETUGAS FINAL", petugas);
 });
   
 const onAddPetugas = async (
