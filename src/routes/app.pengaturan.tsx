@@ -82,8 +82,9 @@ const {
           "-"
       }));
   }
-  console.log("PETUGAS FINAL", petugas);
+  
 });
+  console.log("PETUGAS FINAL", petugas);
   
 const onAddPetugas = async (
 e: React.FormEvent
