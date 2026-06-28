@@ -39,61 +39,32 @@ function PengaturanPage() {
 const {
   data: petugas = [],
   isLoading,
-  error: listError,
+  error: listError
 } = useQuery({
-  queryKey: ["petugas-list"],
-  enabled: isAdmin,
+  queryKey:["petugas-list"],
+  enabled:isAdmin,
 
   queryFn: async () => {
 
-    // ambil semua user petugas
-    const {
-      data: roles,
-      error: roleErr
-    } = await supabase
+    const { data, error } =
+      await supabase
       .from("user_roles")
-      .select("user_id")
-      .eq("role", "petugas");
-
-    if (roleErr)
-      throw roleErr;
-
-    const ids =
-      (roles ?? [])
-      .map((r:any) => r.user_id);
-
-    console.log("IDS", ids);
-
-    if (!ids.length)
-      return [];
-
-    // ambil profil berdasarkan id
-    const {
-      data: profiles,
-      error: profErr
-    } = await supabase
-      .from("profiles")
       .select(`
-        id,
-        email,
-        username,
-        nama_lengkap
-      `);
+        user_id,
+        role,
+        profiles!user_roles_user_id_fkey(
+          id,
+          email,
+          username,
+          nama_lengkap
+        )
+      `)
+      .eq("role","petugas");
 
-    if (profErr)
-      throw profErr;
+    if (error)
+      throw error;
 
-    console.log("PROFILES", profiles);
-
-    const result =
-      (profiles ?? [])
-      .filter((p:any)=>
-        ids.includes(p.id)
-      );
-
-    console.log("PETUGAS FINAL", result);
-
-    return result;
+    return data ?? [];
   }
 });
   
@@ -266,10 +237,10 @@ false
               </thead>
               <tbody>
                 {petugas.map((p:any) => (
-                  <tr key={p.id} className="border-t">
-                    <td className="px-4 py-3 font-medium">{p.nama_lengkap || "-"}</td>
-                    <td className="px-4 py-3">{p.username}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{p.email || "-"}</td>
+                  <tr key={p.user_id} className="border-t">
+                    <td className="px-4 py-3 font-medium">{p.profiles?.nama_lengkap ?? "-"}</td>
+                    <td className="px-4 py-3">{p.profiles?.username ?? "-"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{p.profiles?.email ?? "-"}</td>
                     <td className="px-4 py-3 text-right">
                       <Button size="sm" variant="ghost" onClick={() => removeRole(p.user_id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
