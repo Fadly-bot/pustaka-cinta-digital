@@ -68,7 +68,7 @@ queryFn: async () => {
     username: r.profiles?.username ?? "-",
     email: r.profiles?.email ?? "-"
   }));
-};
+},
   
 const onAddPetugas = async (
 e: React.FormEvent
