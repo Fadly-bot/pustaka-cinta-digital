@@ -65,62 +65,63 @@ function PengaturanPage() {
 const onAddPetugas = async (e: React.FormEvent) => {
   e.preventDefault();
   if (form.password.length < 8) {
-    toast.error(
-      "Password minimal 8 karakter"
-    );
+    toast.error("Password minimal 8 karakter");
     return;
   }
 
-  try{
-   
+  try {
     setSaving(true);
 
-    const result =
-      await supabase.functions.invoke(
-        "create-petugas",
-        {
-          body: {
-            users: [
-              {
-                email: form.email,
-                password: form.password,
-                username: form.username,
-                nama_lengkap:
-                  form.nama_lengkap,
-              },
-            ],
+    // 1. JALANKAN EDGE FUNCTION TERLEBIH DAHULU
+    const result = await supabase.functions.invoke(
+      "create-petugas",
+      {
+        body: {
+          users: [
+            {
+              email: form.email,
+              password: form.password,
+              username: form.username,
+              nama_lengkap: form.nama_lengkap,
             },
+          ],
         },
-      await supabase
-        .from("profiles")
-        .upsert({
-          id: data.user.id,
-          email: form.email,
-          username: form.username,
-          nama_lengkap: form.nama_lengkap
-        }),
-      await supabase
-        .from("user_roles")
-        .insert({
-          user_id: data.user.id,
-          role: "petugas"
-        }),
-         )
-          
-        };
+      }
+    ); // <-- Kurung tutup invoke selesai di sini
 
     if (result.error) {
       throw result.error;
     }
 
-    toast.success(
-      "Akun petugas berhasil dibuat"
-    );
+    // 2. DI SINI TEMPATNYA: KODE PROFILES UPSERT ANDA
+    const { error: upsertError } = await supabase
+      .from("profiles")
+      .upsert({
+        id: data.user.id,
+        email: form.email,
+        username: form.username,
+        nama_lengkap: form.nama_lengkap
+      });
+
+    if (upsertError) throw upsertError;
+
+    // 3. DI SINI TEMPATNYA: KODE USER ROLES INSERT ANDA
+    const { error: roleError } = await supabase
+      .from("user_roles")
+      .insert({
+        user_id: data.user.id,
+        role: "petugas"
+      });
+
+    if (roleError) throw roleError;
+
+    // 4. JIKA SEMUA BERHASIL, RESET FORM DAN CLOSE MODAL
+    toast.success("Akun petugas berhasil dibuat");
     await qc.invalidateQueries({
-      queryKey :["petugas-list"]});
+      queryKey: ["petugas-list"]
+    });
 
     setOpen(false);
-
     setForm({
       email: "",
       username: "",
@@ -129,10 +130,7 @@ const onAddPetugas = async (e: React.FormEvent) => {
     });
 
   } catch (err: any) {
-    toast.error(
-      err?.message ??
-      "Terjadi kesalahan"
-    );
+    toast.error(err?.message ?? "Terjadi kesalahan");
   } finally {
     setSaving(false);
   }
