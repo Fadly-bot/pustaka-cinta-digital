@@ -114,11 +114,7 @@ throw error;
 
 console.log("CREATE DATA", data);
 
-const userId =
-data?.user?.id ??
-data?.users?.[0]?.id ??
-data?.id;
-
+const userId =null;
 console.log("USER ID", userId);
 
 if(userId){
