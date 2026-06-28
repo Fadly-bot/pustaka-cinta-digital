@@ -53,18 +53,50 @@ setKategori(
 
 };
 
-  const onAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!nama.trim()) return;
-    setSaving(true);
-    const { error } = await supabase.from("kategori_buku").insert({ nama_kategori: nama.trim() });
-    setSaving(false);
-    if (error) return toast.error(error.message);
-    setNama("");
-    toast.success("Kategori ditambahkan");
-    await refresh();
-  };
+const onAdd = async (
+  e: React.FormEvent
+) => {
 
+  e.preventDefault();
+
+  if (!nama.trim())
+    return;
+
+  setSaving(true);
+
+  try {
+
+    const {
+      error
+    } =
+    await supabase
+
+      .from(
+        "kategori"
+      )
+
+      .insert([
+        {
+          nama:
+            nama
+        }
+      ])
+      .select();
+    if (error)
+      throw error;
+    toast.success(
+      "Kategori ditambahkan"
+    );
+    setNama("");
+    await refresh();
+  } catch (e:any) {
+    toast.error(
+      e.message
+    );
+  } finally {
+    setSaving(false);
+  }
+};
  const onSaveEdit = async () => {
   setSaving(true);
 
