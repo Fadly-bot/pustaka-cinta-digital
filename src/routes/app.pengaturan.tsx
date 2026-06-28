@@ -99,43 +99,33 @@ await supabase.functions.invoke(
 body:{
 users:[
 {
-email:
-form.email,
-
-password:
-form.password,
-
-username:
-form.username,
-
-nama_lengkap:
-form.nama_lengkap
+email:form.email,
+password:form.password,
+username:form.username,
+nama_lengkap:form.nama_lengkap
 }
 ]
 }
 }
 );
 
-if (
-error
-)
+if(error)
 throw error;
-console.log("CREATE PETUGAS", data);
+
+console.log("CREATE DATA", data);
 
 const userId =
-data?.user?.id
-??
-data?.users?.[0]?.id
-??
+data?.user?.id ??
+data?.users?.[0]?.id ??
 data?.id;
 
-console.log(
-"USER ID",
-userId
-);
+console.log("USER ID", userId);
 
-if (userId) {
+if(userId){
 
+const {
+error: profileError
+} =
 await supabase
 .from("profiles")
 .upsert({
@@ -144,6 +134,11 @@ email:form.email,
 username:form.username,
 nama_lengkap:form.nama_lengkap
 });
+
+console.log(
+"PROFILE ERROR",
+profileError
+);
 
 }
 
@@ -156,12 +151,14 @@ queryKey:[
 "petugas-list"
 ]
 });
-  await qc.refetchQueries({
-    queryKey:["petugas-list"]});
 
-setOpen(
-false
-);
+await qc.refetchQueries({
+queryKey:[
+"petugas-list"
+]
+});
+
+setOpen(false);
 
 setForm({
 email:"",
