@@ -51,41 +51,17 @@ const {
       error: roleErr
     } = await supabase
       .from("user_roles")
-      .select("user_id")
+      .select("*")
       .eq("role", "petugas");
+
+    console.log("ROLE ERROR", roleErr);
+    console.log("ROLES", roles);
 
     if (roleErr)
       throw roleErr;
 
-    console.log("ROLES", roles);
-
-    const ids =
-      (roles ?? [])
-      .map((r:any)=>r.user_id);
-
-    if (ids.length === 0)
-      return [];
-
-    const {
-      data: profiles,
-      error: profErr
-    } = await supabase
-      .from("profiles")
-      .select(`
-        id,
-        email,
-        username,
-        nama_lengkap
-      `)
-      .in("id", ids);
-
-    if (profErr)
-      throw profErr;
-
-    console.log("PROFILES", profiles);
-
-    return profiles ?? [];
-  },
+    return [];
+  }
 });
   
 const onAddPetugas = async (
