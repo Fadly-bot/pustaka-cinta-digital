@@ -64,24 +64,22 @@ function PeminjamPage() {
         .select("*, detail_peminjaman(jumlah, buku(judul, kode_buku))")
         .eq("peminjam_id", detailId!)
         .order("created_at", { ascending: false });
+        .limit(50);
       if (error) throw error;
       return data;
     },
   });
-
   const refresh = async () => {
     await qc.invalidateQueries({ queryKey: ["peminjam"] });
     await qc.refetchQueries({ queryKey: ["peminjam"], type: "active" });
     qc.invalidateQueries({ queryKey: ["peminjam-options"] });
     qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
   };
-
   const openCreate = () => {
     setEditId(null);
     setForm({ nama: "", no_identitas: "", no_hp: "", alamat: "", email: "" });
     setOpen(true);
   };
-
   const openEdit = (p: { id: string; nama: string; no_identitas: string | null; no_hp: string | null; alamat: string | null; email: string | null }) => {
     setEditId(p.id);
     setForm({
@@ -94,10 +92,13 @@ function PeminjamPage() {
     setOpen(true);
   };
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.nama.trim()) return toast.error("Nama wajib diisi");
-    setSaving(true);
+ const onSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!form.nama.trim()) {
+    return toast.error("Nama wajib diisi");
+  }
+  setSaving(true);
+  try {
     const payload = {
       nama: form.nama.trim(),
       no_identitas: form.no_identitas || null,
@@ -105,60 +106,31 @@ function PeminjamPage() {
       alamat: form.alamat || null,
       email: form.email || null,
     };
-    const save = async () => {
-  setSaving(true);
-
-  try {
     console.log("PAYLOAD", payload);
-
-    const result = editId
-      ? await supabase
+    const result = editId ? await supabase
           .from("peminjam")
           .update(payload)
           .eq("id", editId)
-          .select()
-
       : await supabase
           .from("peminjam")
-          .insert([payload as any])
-          .select();
-
-    console.log(result);
+          .insert([payload]);
 
     if (result.error)
       throw result.error;
 
-    toast.success(
-      editId
-        ? "Peminjam diperbarui"
-        : "Peminjam ditambahkan"
-    );
-
+    toast.success(editId ? "Peminjam diperbarui": "Peminjam ditambahkan");
     setOpen(false);
-
     setEditId(null);
-
-    setForm({
-      nama:"",
-      no_identitas:"",
-      no_hp:"",
-      alamat:"",
-      email:""
+    setForm({nama: "", no_identitas: "", no_hp: "", alamat: "", email: "",}); 
+    await qc.invalidateQueries({
+      queryKey: ["peminjam"],
     });
-
-    await refresh();
-
-  } catch (e:any) {
+  } catch (e: any) {
     console.error(e);
-
-    toast.error(
-      e.message
-    );
-
+    toast.error(e.message);  
   } finally {
     setSaving(false);
   }
-  };
 };
 
   const onDelete = async () => {
