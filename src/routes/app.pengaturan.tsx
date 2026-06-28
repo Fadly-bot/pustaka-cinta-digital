@@ -62,19 +62,19 @@ function PengaturanPage() {
    }     
  });         
 
-const onAddPetugas = async (
-  e: React.FormEvent
-) => {
+const onAddPetugas = async (e: React.FormEvent) => {
   e.preventDefault();
-
   if (form.password.length < 8) {
     toast.error(
       "Password minimal 8 karakter"
     );
     return;
-  }
+  };
+  try
+  
+  
 
-  try {
+   {
     setSaving(true);
 
     const result =
