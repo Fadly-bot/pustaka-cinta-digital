@@ -120,15 +120,32 @@ if (
 error
 )
 throw error;
+console.log("CREATE PETUGAS", data);
 
-/*
-JIKA EDGE FUNCTION
-SUDAH MENYIMPAN
-KE PROFILES +
-USER_ROLES
-TIDAK PERLU
-UPSERT LAGI
-*/
+const userId =
+data?.user?.id
+??
+data?.users?.[0]?.id
+??
+data?.id;
+
+console.log(
+"USER ID",
+userId
+);
+
+if (userId) {
+
+await supabase
+.from("profiles")
+.upsert({
+id:userId,
+email:form.email,
+username:form.username,
+nama_lengkap:form.nama_lengkap
+});
+
+}
 
 toast.success(
 "Akun petugas berhasil dibuat"
