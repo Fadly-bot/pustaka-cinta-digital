@@ -46,27 +46,59 @@ const {
 
   queryFn: async () => {
 
-    const { data, error } =
-      await supabase
-      .from("user_roles")
-      .select(`
-        user_id,
-        role,
-        profiles(
-          id,
-          email,
-          username,
-          nama_lengkap
-        )
-      `)
-      .eq("role","petugas");
+const {
+data,
+error
+} =
+await supabase
+.from("user_roles")
+.select(`
+user_id,
+role,
+profiles!user_roles_user_id_fkey(
+id,
+email,
+username,
+nama_lengkap
+)
+`)
+.eq(
+"role",
+"petugas"
+);
 
-    if (error)
-      throw error;
+if(error)
+throw error;
 
-    return data ?? [];
-  }
-});
+console.log(
+"PETUGAS",
+data
+);
+
+return (
+data ?? []
+).map(
+(r:any)=>({
+
+user_id:
+r.user_id,
+
+nama_lengkap:
+r.profiles?.nama_lengkap
+?? "-",
+
+username:
+r.profiles?.username
+?? "-",
+
+email:
+r.profiles?.email
+?? "-"
+
+})
+);
+
+}
   
 const onAddPetugas = async (
 e: React.FormEvent
