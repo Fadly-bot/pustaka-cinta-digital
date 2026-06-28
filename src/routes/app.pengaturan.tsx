@@ -36,31 +36,73 @@ function PengaturanPage() {
 
   const isAdmin = auth.roles.includes("admin");
 
- const {data: petugas = [], isLoading, error: listError} = useQuery({
-  queryKey: ["petugas-list"],
-  enabled: isAdmin,
-  queryFn: async () => {
- const {data, error } = await supabase
-  .from("user_roles")
-  .select(` user_id, role, profiles!user_roles_user_id_fkey( id, email, username, nama_lengkap) `)
-  .eq("role", "petugas" );
+const {
+data: petugas = [],
+isLoading,
+error: listError
+} = useQuery({
 
-    if (error)
-      throw error;
+queryKey:[
+"petugas-list"
+],
 
-    return (data ?? []).map((r: any) => ({
-      user_id:
-        r.user_id,
-     nama_lengkap:
-          r.profiles?.nama_lengkap ?? "-",
-     username:
-          r.profiles?.username ?? "-",
-     email:
-        r.profiles?.email ?? "-"
-    })    
-    );
-   }     
- });         
+enabled:isAdmin,
+
+queryFn: async () => {
+
+const {
+data,
+error
+}
+=
+await supabase
+
+.from(
+"user_roles"
+)
+
+.select(`
+user_id,
+profiles!inner(
+id,
+email,
+username,
+nama_lengkap
+)
+`)
+
+.eq(
+"role",
+"petugas"
+);
+
+if (
+error
+)
+throw error;
+
+return (
+data ?? []
+)
+.map(
+(r:any)=>({
+user_id:
+r.user_id,
+
+email:
+r.profiles.email,
+
+username:
+r.profiles.username,
+
+nama_lengkap:
+r.profiles.nama_lengkap
+})
+);
+
+}
+
+});        
 
 const onAddPetugas = async (
 e: React.FormEvent
@@ -215,7 +257,7 @@ false
             <div className="flex items-center justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : listError ? (
             <p className="text-center py-10 text-sm text-destructive">Gagal memuat: {(listError as Error).message}</p>
-          ) : !petugas || petugas.length === 0 ? (
+          ) :  petugas.length === 0 ? (
             <p className="text-center py-10 text-sm text-muted-foreground">Belum ada petugas.</p>
           ) : (
             <table className="w-full text-sm">
