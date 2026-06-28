@@ -91,7 +91,9 @@ const onAddPetugas = async (
                   form.nama_lengkap,
               },
             ],
-            await supabase
+            },
+        },
+      await supabase
         .from("user_roles")
         .insert({id: user.roles, email, username, nama_lengkap});
       await supabase
@@ -99,10 +101,9 @@ const onAddPetugas = async (
         .insert({
           user_id: user.id,
           role: "petugas"});
-          },
-        }
-      
-      );
+          );
+          
+        };
 
     if (result.error) {
       throw result.error;
