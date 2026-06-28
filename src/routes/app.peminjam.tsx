@@ -64,7 +64,7 @@ function PeminjamPage() {
         .select("*, detail_peminjaman(jumlah, buku(judul, kode_buku))")
         .eq("peminjam_id", detailId!)
         .order("created_at", { ascending: false });
-        .limit(50);
+  
       if (error) throw error;
       return data;
     },
