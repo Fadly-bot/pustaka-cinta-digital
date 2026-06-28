@@ -70,9 +70,9 @@ const onAddPetugas = async (e: React.FormEvent) => {
     );
     return;
   }
-  setSaving(true);
-  try
-   {
+
+  try{
+   
     setSaving(true);
 
     const result =
