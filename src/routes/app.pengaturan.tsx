@@ -47,40 +47,85 @@ const {
   queryFn: async () => {
 
     const {
-      data,
-      error
+      data: roles,
+      error: roleErr
     } =
     await supabase
       .from("user_roles")
       .select(`
-        user_id,
-        role,
-        profiles!user_roles_user_id_fkey(
-          id,
-          email,
-          username,
-          nama_lengkap
-        )
+        user_id
       `)
       .eq(
         "role",
         "petugas"
       );
 
-    if (error)
-      throw error;
+    if (roleErr)
+      throw roleErr;
 
-    // TAMBAH DI SINI
+    const ids =
+      (roles ?? [])
+      .map(
+        (r:any)=>
+        r.user_id
+      );
+
+    if (!ids.length)
+      return [];
+
+    const {
+      data: profiles,
+      error: profErr
+    } =
+    await supabase
+      .from("profiles")
+      .select(`
+        id,
+        email,
+        username,
+        nama_lengkap
+      `)
+      .in(
+        "id",
+        ids
+      );
+
+    if (profErr)
+      throw profErr;
+
     console.log(
-      "PETUGAS RAW",
-      JSON.stringify(
-        data,
-        null,
-        2
-      )
+      "PROFILES",
+      profiles
     );
 
-    return data ?? [];
+    return ids.map(
+      (id)=>{
+
+        const p =
+          profiles?.find(
+            (x:any)=>
+            x.id===id
+          );
+
+        return {
+          user_id:id,
+
+          nama_lengkap:
+            p?.nama_lengkap ??
+            "-",
+
+          username:
+            p?.username ??
+            "-",
+
+          email:
+            p?.email ??
+            "-"
+        };
+
+      }
+    );
+
   }
 });
   
