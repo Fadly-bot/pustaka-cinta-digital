@@ -93,6 +93,14 @@ const onAddPetugas = async (
             ],
           },
         }
+      await supabase
+        .from("user_roles")
+        .insert({id: user.roles, email, username, nama_lengkap});
+      await supabase
+        .from("user_roles")
+        .insert({
+          user_id: user.id,
+          role: "petugas"});
       );
 
     if (result.error) {
@@ -113,8 +121,6 @@ const onAddPetugas = async (
       nama_lengkap: "",
       password: "",
     });
-
-    await qc.refetchQueries({ queryKey: ["petugas-list"] });
 
   } catch (err: any) {
     toast.error(
