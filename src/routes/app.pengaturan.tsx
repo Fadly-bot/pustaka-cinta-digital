@@ -42,68 +42,33 @@ isLoading,
 error: listError
 } = useQuery({
 
-queryKey:[
-"petugas-list"
-],
-
-enabled:isAdmin,
-
 queryFn: async () => {
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select(`
+      user_id,
+      role,
+      profiles!user_roles_user_id_fkey(
+        id,
+        email,
+        username,
+        nama_lengkap
+      )
+    `)
+    .eq("role", "petugas");
 
-const {
-data,
-error
+  console.log("RAW PETUGAS", data);
+
+  if (error)
+    throw error;
+
+  return (data ?? []).map((r:any) => ({
+    user_id: r.user_id,
+    nama_lengkap: r.profiles?.nama_lengkap ?? "-",
+    username: r.profiles?.username ?? "-",
+    email: r.profiles?.email ?? "-"
+  }));
 }
-=
-await supabase
-
-.from(
-"user_roles"
-)
-
-.select(`
-user_id,
-profiles!inner(
-id,
-email,
-username,
-nama_lengkap
-)
-`)
-
-.eq(
-"role",
-"petugas"
-);
-
-if (
-error
-)
-throw error;
-
-return (
-data ?? []
-)
-.map(
-(r:any)=>({
-user_id:
-r.user_id,
-
-email:
-r.profiles.email,
-
-username:
-r.profiles.username,
-
-nama_lengkap:
-r.profiles.nama_lengkap
-})
-);
-
-}
-
-});        
-
 const onAddPetugas = async (
 e: React.FormEvent
 ) => {
