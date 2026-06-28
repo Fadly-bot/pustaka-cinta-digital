@@ -94,14 +94,19 @@ const onAddPetugas = async (
             },
         },
       await supabase
-        .from("user_roles")
-        .insert({id: user.roles, email, username, nama_lengkap});
+        .from("profiles")
+        .upsert({
+          id: data.user.id,
+          email: form.email,
+          username: form.username,
+          nama_lengkap: form.nama_lengkap
+        }),
       await supabase
         .from("user_roles")
         .insert({
-          user_id: user.id,
+          user_id: data.user.id,
           role: "petugas"});
-          );
+         )
           
         };
 
