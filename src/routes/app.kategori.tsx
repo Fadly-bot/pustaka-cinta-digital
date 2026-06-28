@@ -31,10 +31,27 @@ function KategoriPage() {
     },
   });
 
-  const refresh = async () => {
-    await qc.invalidateQueries({ queryKey: ["kategori_buku"] });
-    await qc.refetchQueries({ queryKey: ["kategori_buku"], type: "active" });
-  };
+  const refresh =
+async ()=>{
+
+const {
+ data,
+ error
+}=await supabase
+.from("kategori")
+.select("*")
+.order(
+ "nama"
+);
+
+if(error)
+ throw error;
+
+setKategori(
+ data ?? []
+);
+
+};
 
   const onAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,18 +65,59 @@ function KategoriPage() {
     await refresh();
   };
 
-  const onSaveEdit = async (id: string) => {
-    if (!editNama.trim()) return toast.error("Nama tidak boleh kosong");
-    const { error } = await supabase
-      .from("kategori_buku")
-      .update({ nama_kategori: editNama.trim() })
-      .eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Kategori diperbarui");
-    setEditId(null);
-    setEditNama("");
-    await refresh();
-  };
+ const onSaveEdit = async () => {
+  setSaving(true);
+
+  const { error } =
+    editId
+      ? await supabase
+          .from("kategori")
+          .update({
+            nama: form.nama,
+            deskripsi:
+              form.deskripsi,
+          })
+          .eq(
+            "id",
+            editId
+          )
+
+      : await supabase
+          .from("kategori")
+          .insert([
+            {
+              nama:
+                form.nama,
+
+              deskripsi:
+                form.deskripsi,
+            },
+          ]);
+
+  setSaving(false);
+
+  if (error)
+    return toast.error(
+      error.message
+    );
+
+  toast.success(
+    editId
+      ? "Kategori diperbarui"
+      : "Kategori ditambahkan"
+  );
+
+  setOpen(false);
+
+  setEditId(null);
+
+  setForm({
+    nama: "",
+    deskripsi: "",
+  });
+
+  await refresh();
+};
 
   const onDelete = async (id: string) => {
     const { count } = await supabase
