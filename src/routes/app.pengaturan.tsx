@@ -39,39 +39,53 @@ function PengaturanPage() {
 const {
   data: petugas = [],
   isLoading,
-  error: listError
+  error: listError,
 } = useQuery({
   queryKey: ["petugas-list"],
-
   enabled: isAdmin,
 
   queryFn: async () => {
-    const { data, error } = await supabase
+
+    const {
+      data: roles,
+      error: roleErr
+    } = await supabase
       .from("user_roles")
-      .select(`
-        user_id,
-        role,
-        profiles!user_roles_user_id_fkey(
-          id,
-          email,
-          username,
-          nama_lengkap
-        )
-      `)
+      .select("user_id")
       .eq("role", "petugas");
 
-    if (error)
-      throw error;
+    if (roleErr)
+      throw roleErr;
 
-    console.log("RAW PETUGAS", data);
+    console.log("ROLES", roles);
 
-    return (data ?? []).map((r:any) => ({
-      user_id: r.user_id,
-      nama_lengkap: r.profiles?.nama_lengkap ?? "-",
-      username: r.profiles?.username ?? "-",
-      email: r.profiles?.email ?? "-"
-    }));
-  }
+    const ids =
+      (roles ?? [])
+      .map((r:any)=>r.user_id);
+
+    if (ids.length === 0)
+      return [];
+
+    const {
+      data: profiles,
+      error: profErr
+    } = await supabase
+      .from("profiles")
+      .select(`
+        id,
+        email,
+        username,
+        nama_lengkap
+      `)
+      .in("id", ids);
+
+    if (profErr)
+      throw profErr;
+
+    console.log("PROFILES", profiles);
+
+    return profiles ?? [];
+  },
 });
   
 const onAddPetugas = async (
