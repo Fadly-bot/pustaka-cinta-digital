@@ -51,11 +51,10 @@ function PeminjamanPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("peminjaman")
-        .select("*, peminjam(nama, kode_peminjam), detail_peminjaman(jumlah, buku(judul, kode_buku))")
-        .order("created_at", { ascending: false })
-        .limit(100);
+        .select("*")
+        .order("created_at", {ascending:false});
       if (error) throw error;
-      return data;
+      return data ?? [];
     },
   });
 
