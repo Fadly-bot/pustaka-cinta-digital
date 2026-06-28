@@ -158,6 +158,7 @@ function PeminjamPage() {
   } finally {
     setSaving(false);
   }
+  };
 };
 
   const onDelete = async () => {
