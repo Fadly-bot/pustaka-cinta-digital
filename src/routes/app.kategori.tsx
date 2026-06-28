@@ -41,7 +41,7 @@ const {
 .from("kategori")
 .select("*")
 .order(
- "nama"
+ "nama_kategori"
 );
 
 if(error)
@@ -77,7 +77,7 @@ const onAdd = async (
 
       .insert([
         {
-          nama:
+          nama_kategori:
             nama
         }
       ])
