@@ -42,7 +42,7 @@ function PengaturanPage() {
     queryFn: async () => {
   const {data: roles, error: roleErr}=await supabase
     .from("user_roles")
-    .select(`role,profiles(id,email,username,nama_lengkap))
+    .select(role,profiles(id,email,username,nama_lengkap))
     .eq("role","petugas");
   if (roleErr)
     throw roleErr;
