@@ -59,11 +59,29 @@ function PeminjamanPage() {
     },
   });
 
-  const { data: peminjamOpts } = useQuery({
-    queryKey: ["peminjam-options"],
-    queryFn: async () => (await supabase.from("peminjam").select("id, nama, kode_peminjam").order("nama")).data ?? [],
-  });
+ const { data: peminjamOpts = [] } = useQuery({
+  queryKey: ["peminjam-options"],
 
+  queryFn: async () => {
+    const {
+      data,
+      error,
+    } = await supabase
+      .from("peminjam")
+      .select(
+        "id, nama, kode_peminjam"
+      )
+      .order(
+        "nama");
+
+    if (error)
+      throw error;
+
+    return data ?? [];
+  },
+});
+  console.log("PEMINJAM", peminjamOpts);
+  
   const { data: bukuOpts } = useQuery({
     queryKey: ["buku-options"],
     queryFn: async () =>
@@ -206,7 +224,7 @@ function PeminjamanPage() {
                 <SelectTrigger><SelectValue placeholder="Pilih peminjam" /></SelectTrigger>
                 <SelectContent>
                   {peminjamOpts?.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.nama} ({p.kode_peminjam})</SelectItem>
+                    <SelectItem key={p.id} value={String(p.id)}>{p.nama}{" "} ({p.kode_peminjam ?? "-"})</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
