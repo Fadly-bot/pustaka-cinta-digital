@@ -36,20 +36,31 @@ function PengaturanPage() {
 
   const isAdmin = auth.roles.includes("admin");
 
-  const {data: petugas = [], isLoading} = useQuery({
-    queryKey:["petugas-list"],
-    enabled:isAdmin,
-    queryFn: async () => {
-  const {data: roles, error: roleErr}=await supabase
-    .from("user_roles")
-    .select(role,profiles(id,email,username,nama_lengkap))
-    .eq("role","petugas");
-  if (roleErr)
-    throw roleErr;
-  return (roles ?? []).map((r:any)=> r.profiles)
-   .filter(Boolean);
-  }
- });
+ const {data: petugas = [], isLoading, error: listError} = useQuery({
+  queryKey: ["petugas-list"],
+  enabled: isAdmin,
+  queryFn: async () => {
+ const {data, error } = await supabase
+  .from("user_roles")
+  .select(` user_id, role, profiles!user_roles_user_id_fkey( id, email, username, nama_lengkap) `)
+  .eq("role", "petugas" );
+
+    if (error)
+      throw error;
+
+    return (data ?? []).map((r: any) => ({
+      user_id:
+        r.user_id,
+     nama_lengkap:
+          r.profiles?.nama_lengkap ?? "-",
+     username:
+          r.profiles?.username ?? "-",
+     email:
+        r.profiles?.email ?? "-"
+    })    
+    );
+   }     
+ });         
 
 const onAddPetugas = async (
   e: React.FormEvent
@@ -103,7 +114,6 @@ const onAddPetugas = async (
       password: "",
     });
 
-    await qc.invalidateQueries({ queryKey: ["petugas-list"] });
     await qc.refetchQueries({ queryKey: ["petugas-list"] });
 
   } catch (err: any) {
