@@ -100,16 +100,11 @@ function PeminjamanPage() {
     if (!peminjamId) return toast.error("Pilih peminjam");
     if (items.length === 0) return toast.error("Tambahkan minimal 1 buku");
     setSaving(true);
-    console.log("AUTH USER", auth.user);
-    console.log("PETUGAS ID", auth.user?.id);
-    console.log("ITEMS", items);
-    console.log("ITEMS PERTAMA", items?.[0]);
     const { data: pinj, error } = await supabase
       .from("peminjaman")
       .insert({
         peminjam_id: peminjamId,
-        petugas_id: auth.user?.id,
-        buku_id: items[0]?.id,
+        petugas_id: auth.user?.id ?? null,
         tanggal_pinjam: tglPinjam,
         tanggal_kembali: tglKembali,
         status: "dipinjam",
