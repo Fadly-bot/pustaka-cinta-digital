@@ -113,7 +113,7 @@ function PeminjamPage() {
           .eq("id", editId)
       : await supabase
           .from("peminjam")
-          .insert([payload]);
+          .insert([payload] as never);
 
     if (result.error)
       throw result.error;
