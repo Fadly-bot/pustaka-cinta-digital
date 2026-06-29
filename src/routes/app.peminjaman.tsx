@@ -102,12 +102,13 @@ function PeminjamanPage() {
     setSaving(true);
     console.log("AUTH USER", auth.user);
     console.log("PETUGAS ID", auth.user?.id);
+    console.log("ITEMS", items);
     const { data: pinj, error } = await supabase
       .from("peminjaman")
       .insert({
         peminjam_id: peminjamId,
         petugas_id: auth.user?.id,
-        buku_id: items[0]?.buku_id,
+        buku_id: items[0]?.id,
         tanggal_pinjam: tglPinjam,
         tanggal_kembali: tglKembali,
         status: "dipinjam",
