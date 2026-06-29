@@ -100,6 +100,8 @@ function PeminjamanPage() {
     if (!peminjamId) return toast.error("Pilih peminjam");
     if (items.length === 0) return toast.error("Tambahkan minimal 1 buku");
     setSaving(true);
+    console.log("AUTH USER", auth.user);
+    console.log("PETUGAS ID", auth.user?.id);
     const { data: pinj, error } = await supabase
       .from("peminjaman")
       .insert({
