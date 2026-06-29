@@ -105,8 +105,9 @@ function PeminjamanPage() {
         petugas_id: auth.user?.id ?? null,
         tanggal_pinjam: tglPinjam,
         tanggal_kembali: tglKembali,
-        status: "Dipinjam",
+        status: "Dipinjam".trim(),
         catatan: catatan || null};
+    console.log("STATUS", patload.status);
     console.log("INSERT PEMINJAMAN", JSON.stringfy( payload, null, 2));
     console.log("ITEMS", JSON.stringfy(items, null, 2));
     const { data: pinj, error } = await supabase
