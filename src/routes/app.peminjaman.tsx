@@ -95,29 +95,48 @@ function PeminjamanPage() {
     setBukuId("");
   };
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!peminjamId) return toast.error("Pilih peminjam");
-    if (items.length === 0) return toast.error("Tambahkan minimal 1 buku");
-    setSaving(true);
-    const payload = {
-        peminjam_id: peminjamId,
-        petugas_id: auth.user?.id ?? null,
-        tanggal_pinjam: tglPinjam,
-        tanggal_kembali: tglKembali,
-        status: "Dipinjam".trim(),
-        catatan: catatan || null};
-    console.log("STATUS", patload.status);
-    console.log("INSERT PEMINJAMAN", JSON.stringfy( payload, null, 2));
-    console.log("ITEMS", JSON.stringfy(items, null, 2));
-    const { data: pinj, error } = await supabase
-      .from("peminjaman")
-      .insert(payload)
-      .select("id")
-      .single();
+ const submit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    console.log("INSERT ERROR", error);
-    
+  if (!peminjamId)
+    return toast.error("Pilih peminjam");
+
+  if (items.length === 0)
+    return toast.error("Tambahkan minimal 1 buku");
+
+  setSaving(true);
+
+  const payload = {
+    peminjam_id: peminjamId,
+    petugas_id: auth.user?.id ?? null,
+    tanggal_pinjam: tglPinjam,
+    tanggal_kembali: tglKembali,
+    status: "Dipinjam",
+    catatan: catatan || null,
+  };
+
+  console.log("STATUS", payload.status);
+  console.log(
+    "INSERT PEMINJAMAN",
+    JSON.stringify(payload, null, 2)
+  );
+
+  console.log(
+    "ITEMS",
+    JSON.stringify(items, null, 2)
+  );
+
+  const {
+    data: pinj,
+    error
+  } = await supabase
+    .from("peminjaman")
+    .insert(payload)
+    .select("id")
+    .single();
+
+  console.log("INSERT ERROR", error);
+};
     if (error || !pinj) {
       setSaving(false);
       return toast.error(error?.message ?? "Gagal");
