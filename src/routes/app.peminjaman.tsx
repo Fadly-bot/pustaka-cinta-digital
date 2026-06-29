@@ -106,8 +106,8 @@ function PeminjamanPage() {
         tanggal_pinjam: tglPinjam,
         tanggal_kembali: tglKembali,
         status: "Dipinjam",
-        catatan: catatan || null},
-      console.log("INSERT PEMINJAMAN", payload);
+        catatan: catatan || null};
+    console.log("INSERT PEMINJAMAN", payload);
     const { data: pinj, error } = await supabase
       .from("peminjaman")
       .insert(payload)
