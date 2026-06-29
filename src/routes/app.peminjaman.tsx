@@ -136,11 +136,11 @@ function PeminjamanPage() {
     .single();
 
   console.log("INSERT ERROR", error);
-};
+
     if (error || !pinj) {
       setSaving(false);
       return toast.error(error?.message ?? "Gagal");
-    }
+    };
     const { error: dErr } = await supabase
       .from("detail_peminjaman")
       .insert(items.map((i) => ({ peminjaman_id: pinj.id, buku_id: i.buku_id, jumlah: i.jumlah })) as never);
