@@ -43,7 +43,6 @@ const {
 } = useQuery({
   queryKey:["petugas-list"],
   enabled:isAdmin,
-
   queryFn: async () => {
 
     const {
@@ -92,7 +91,7 @@ const {
 
     if (profErr)
       throw profErr;
-
+    console.log("IDS", ids);
     console.log(
       "PROFILES",
       profiles
