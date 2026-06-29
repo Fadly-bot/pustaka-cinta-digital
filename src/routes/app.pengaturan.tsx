@@ -309,9 +309,9 @@ false
               <tbody>
                 {petugas.map((p:any) => (
                   <tr key={p.user_id} className="border-t">
-                    <td className="px-4 py-3 font-medium">{p.profiles?.nama_lengkap ?? }</td>
-                    <td className="px-4 py-3">{p.profiles?.username ?? }</td>
-                    <td className="px-4 py-3 text-muted-foreground">{p.profiles?.email ?? }</td>
+                    <td className="px-4 py-3 font-medium">{p.profiles?.nama_lengkap ?? "-"}</td>
+                    <td className="px-4 py-3">{p.profiles?.username ?? "-"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{p.profiles?.email ?? "-"}</td>
                     <td className="px-4 py-3 text-right">
                       <Button size="sm" variant="ghost" onClick={() => removeRole(p.user_id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
