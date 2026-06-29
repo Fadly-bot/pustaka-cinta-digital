@@ -100,16 +100,17 @@ function PeminjamanPage() {
     if (!peminjamId) return toast.error("Pilih peminjam");
     if (items.length === 0) return toast.error("Tambahkan minimal 1 buku");
     setSaving(true);
-    const { data: pinj, error } = await supabase
-      .from("peminjaman")
-      .insert({
+    const payload = {
         peminjam_id: peminjamId,
         petugas_id: auth.user?.id ?? null,
         tanggal_pinjam: tglPinjam,
         tanggal_kembali: tglKembali,
         status: "Dipinjam",
-        catatan: catatan || null,
-      } )
+        catatan: catatan || null},
+      console.log("INSERT PEMINJAMAN", payload);
+    const { data: pinj, error } = await supabase
+      .from("peminjaman")
+      .insert(payload)
       .select("id")
       .single();
     if (error || !pinj) {
