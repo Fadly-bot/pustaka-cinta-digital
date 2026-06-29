@@ -108,7 +108,7 @@ function PeminjamanPage() {
       .insert({
         peminjam_id: peminjamId,
         petugas_id: auth.user?.id,
-        buku_id: items[0]?.id,
+        buku_id: items[0]?.buku_id,
         tanggal_pinjam: tglPinjam,
         tanggal_kembali: tglKembali,
         status: "dipinjam",
