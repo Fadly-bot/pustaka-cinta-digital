@@ -25,7 +25,7 @@ function PengembalianPage() {
       let q = supabase
         .from("peminjaman")
         .select("*, peminjam(nama, kode_peminjam), detail_peminjaman(jumlah, buku(judul, kode_buku))")
-        .neq("status", "dikembalikan")
+        .in("status", ["Dipinjam", "Terlambat"])
         .order("tanggal_kembali");
       const { data, error } = await q;
       if (error) throw error;
@@ -45,7 +45,7 @@ function PengembalianPage() {
   const kembalikan = async (id: string) => {
     const { error } = await supabase
       .from("peminjaman")
-      .update({ status: "dikembalikan", tanggal_dikembalikan: format(new Date(), "yyyy-MM-dd") })
+      .update({ status: "Kembali", tanggal_dikembalikan: format(new Date(), "yyyy-MM-dd") })
       .eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Buku telah dikembalikan");
