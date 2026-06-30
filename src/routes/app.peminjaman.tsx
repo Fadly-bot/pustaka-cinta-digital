@@ -91,7 +91,7 @@ function PeminjamanPage() {
     const b = bukuOpts?.find((x) => x.id === bukuId);
     if (!b) return;
     if (items.find((i) => i.buku_id === bukuId)) return toast.error("Buku sudah ditambahkan");
-    setItems([...items, { buku_id: selectedBook.id, judul: selectedBook.judul, jumlah: 1, max: b.jumlah_tersedia }]);
+    setItems([...items, { buku_id: b.id, judul: b.judul, jumlah: 1, max: b.jumlah_tersedia }]);
     setBukuId("");
   };
 
