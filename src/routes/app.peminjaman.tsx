@@ -63,7 +63,7 @@ function PeminjamanPage() {
   queryFn: async () => {
     const {data, error,} = await supabase
       .from("peminjam")
-      .select('*, peminjam(nama, kode_peminjam), detail_peminjaman(jumlah, buku(judul))');
+      .select('*, peminjam(nama, kode_peminjam), detail_peminjaman(jumlah, buku(judul))')
       .order( "nama");
     if (error)
       throw error;  
