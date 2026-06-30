@@ -111,7 +111,7 @@ function PeminjamanPage() {
     petugas_id: auth.user?.id ?? null,
     tanggal_pinjam: tglPinjam,
     tanggal_kembali: tglKembali,
-    status: "dipinjam" as const,
+    status: "dipinjam" ,
     catatan: catatan || null,
   };
 
@@ -125,7 +125,8 @@ function PeminjamanPage() {
     "ITEMS",
     JSON.stringify(items, null, 2)
   );
-   
+   console.log("STATUS FINAL: ", JSON.stringify(payload.status));
+   console.log("PAYLOAD:", JSON.stringify(payload,null,2));
 
   const {
     data: pinj,
