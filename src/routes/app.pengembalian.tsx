@@ -22,16 +22,34 @@ function PengembalianPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["pengembalian-list", search],
     queryFn: async () => {
-      let q = supabase
+      const { data: pinj, error } = await supabase
         .from("peminjaman")
-        .select('*, peminjam(nama, kode_peminjam), detail_peminjaman(jumlah, buku(judul))')
-        .in("status", ["Dipinjam", "Terlambat"])
+        .select("*, peminjam:peminjam_id(nama, kode_peminjam)")
+        .eq("status", "dipinjam")
         .order("tanggal_kembali");
-      const { data, error } = await q;
-      console.log("RAW PENGEMBALIAN", data);
-      console.log("QUERY ERROR", error);
       if (error) throw error;
-      const filtered = (data ?? []).filter((p) => {
+      const rows = (pinj as any[]) ?? [];
+      let merged: any[] = rows;
+      if (rows.length) {
+        const ids = rows.map((r) => r.id);
+        const { data: details } = await supabase
+          .from("detail_peminjaman")
+          .select("peminjaman_id, buku_id, jumlah")
+          .in("peminjaman_id", ids);
+        const bukuIds = Array.from(new Set((details ?? []).map((d: any) => d.buku_id)));
+        const { data: bukus } = bukuIds.length
+          ? await supabase.from("buku").select("id, judul, kode_buku").in("id", bukuIds)
+          : { data: [] as any[] };
+        const bukuMap = new Map((bukus ?? []).map((b: any) => [b.id, b]));
+        const detailMap = new Map<string, any[]>();
+        (details ?? []).forEach((d: any) => {
+          const arr = detailMap.get(d.peminjaman_id) ?? [];
+          arr.push({ jumlah: d.jumlah, buku: bukuMap.get(d.buku_id) ?? null });
+          detailMap.set(d.peminjaman_id, arr);
+        });
+        merged = rows.map((r) => ({ ...r, detail_peminjaman: detailMap.get(r.id) ?? [] }));
+      }
+      const filtered = merged.filter((p) => {
         if (!search.trim()) return true;
         const s = search.toLowerCase();
         const matchPem = (p.peminjam?.nama ?? "").toLowerCase().includes(s) || (p.peminjam?.kode_peminjam ?? "").toLowerCase().includes(s);
@@ -47,16 +65,16 @@ function PengembalianPage() {
   const kembalikan = async (id: string) => {
     const { error } = await supabase
       .from("peminjaman")
-      .update({ status: "Kembali", tanggal_kembali: format(new Date(), "yyyy-MM-dd") })
+      .update({ status: "dikembalikan", tanggal_dikembalikan: format(new Date(), "yyyy-MM-dd") })
       .eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Buku telah dikembalikan");
-    await qc.invalidateQueries();
-    await qc.refetchQueries();
-    window.location.reload();
+    await qc.invalidateQueries({ queryKey: ["pengembalian-list"] });
+    await qc.refetchQueries({ queryKey: ["pengembalian-list"], type: "active" });
     qc.invalidateQueries({ queryKey: ["peminjaman-list"] });
     qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
     qc.invalidateQueries({ queryKey: ["buku"] });
+    qc.invalidateQueries({ queryKey: ["buku-options"] });
   };
 
   return (
@@ -98,9 +116,11 @@ function PengembalianPage() {
                         <div className="text-xs font-mono text-muted-foreground">{p.peminjam?.kode_peminjam}</div>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
-                        {p.detail_peminjaman?.map((d: { jumlah: number; buku: { judul: string; kode_buku: string } | null }, i: number) => (
-                          <div key={i}>{d.buku?.judul} ({d.buku?.kode_buku}) × {d.jumlah}</div>
-                        ))}
+                        {p.detail_peminjaman?.length
+                          ? p.detail_peminjaman.map((d: any, i: number) => (
+                              <div key={i}>{d.buku?.judul ?? "-"} × {d.jumlah}</div>
+                            ))
+                          : "-"}
                       </td>
                       <td className="px-4 py-3">{format(new Date(p.tanggal_kembali), "dd MMM yyyy")}</td>
                       <td className="px-4 py-3">
