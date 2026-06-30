@@ -63,7 +63,7 @@ function PeminjamanPage() {
   queryFn: async () => {
     const {data, error,} = await supabase
       .from("peminjam")
-      .select('*, peminjam(nama, kode_peminjam), detail_peminjaman(jumlah, buku(judul))')
+      .select('id, tanggal_pinjam, tanggal_kembali, status, peminjam(nama, kode_peminjam), detail_peminjaman(buku_id, jumlah, buku:buku_id(judul))')
       .order( "nama");
     if (error)
       throw error;  
@@ -210,7 +210,7 @@ function PeminjamanPage() {
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
                       {p.detail_peminjaman?.length? p.detail_peminjaman.map((d:any, i:number)=>(
-                      <div key={i}>{d.buku?.judul} × {d.jumlah}</div>)): "-"
+                      <div key={i}>{d.buku?.judul ?? "-"} × {d.jumlah}</div>)): "-"
                       }</td>
 
                       <td className="px-4 py-3">{format(new Date(p.tanggal_pinjam), "dd MMM yyyy")}</td>
