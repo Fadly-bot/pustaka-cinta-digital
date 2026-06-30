@@ -125,7 +125,7 @@ function PeminjamanPage() {
     "ITEMS",
     JSON.stringify(items, null, 2)
   );
-   console.log("STATUS RAW =", JSON.stringify(payload.status));
+   
 
   const {
     data: pinj,
