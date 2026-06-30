@@ -54,6 +54,7 @@ function PeminjamanPage() {
         .select("*, peminjam:peminjam_id(nama, kode_peminjam), detail_peminjaman(jumlah, buku:buku_id(judul))")
         .order("created_at", {ascending:false});
       if (error) throw error;
+      console.log("PEMINJAMAN RAW", JSON.stringify(data, null, 2));
       return (data as any[]) ?? [];
     },
   });
