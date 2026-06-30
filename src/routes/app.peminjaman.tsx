@@ -111,7 +111,7 @@ function PeminjamanPage() {
     petugas_id: auth.user?.id ?? null,
     tanggal_pinjam: tglPinjam,
     tanggal_kembali: tglKembali,
-    status: "Dipinjam" as const,
+    status: "Dipinjam" ,
     catatan: catatan || null,
   };
 
