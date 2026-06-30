@@ -24,7 +24,7 @@ function PengembalianPage() {
     queryFn: async () => {
       let q = supabase
         .from("peminjaman")
-        .select("*, peminjam(nama, kode_peminjam), detail_peminjaman(jumlah, buku(judul, kode_buku))")
+        .select('*, peminjam(nama, kode_peminjam), detail_peminjaman(jumlah, buku(judul))')
         .in("status", ["Dipinjam", "Terlambat"])
         .order("tanggal_kembali");
       const { data, error } = await q;
@@ -35,8 +35,8 @@ function PengembalianPage() {
         if (!search.trim()) return true;
         const s = search.toLowerCase();
         const matchPem = (p.peminjam?.nama ?? "").toLowerCase().includes(s) || (p.peminjam?.kode_peminjam ?? "").toLowerCase().includes(s);
-        const matchBuk = p.detail_peminjaman?.some((d: { buku: { judul: string; kode_buku: string } | null }) =>
-          (d.buku?.judul ?? "").toLowerCase().includes(s) || (d.buku?.kode_buku ?? "").toLowerCase().includes(s),
+        const matchBuk = p.detail_peminjaman?.some((d:any) =>
+          (d.buku?.judul ?? "").toLowerCase().includes(s)
         );
         return matchPem || matchBuk;
       });
