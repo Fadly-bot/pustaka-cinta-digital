@@ -51,7 +51,7 @@ function PeminjamanPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("peminjaman")
-        .select("*, peminjam:peminjam_id(nama, kode_peminjam), detail_peminjaman(id, buku_id, jumlah, buku(judul))")
+        .select('*, peminjam:peminjam_id(nama, kode_peminjam), detail_peminjaman!detail_peminjaman_peminjaman_id_fkey(jumlah, buku:buku_id(judul))')
         .order("created_at", {ascending:false});
       console.log("PEMINJAMAN RAW", JSON.stringify(data, null, 2));
       if (error) throw error;
