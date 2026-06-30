@@ -211,7 +211,9 @@ function PeminjamanPage() {
                       <td className="px-4 py-3 text-muted-foreground">
                         {p.detail_peminjaman?.map((d:any) => (
                           <div key={i}>{d.buku?.judul} × {d.jumlah}</div>
-                        ))}
+                        ))
+                        .filter(Boolean)
+                        .join(",") }
                       </td>
                       <td className="px-4 py-3">{format(new Date(p.tanggal_pinjam), "dd MMM yyyy")}</td>
                       <td className="px-4 py-3">{format(new Date(p.tanggal_kembali), "dd MMM yyyy")}</td>
