@@ -47,18 +47,24 @@ function PeminjamanPage() {
   const [saving, setSaving] = useState(false);
 
   const { data: list, isLoading } = useQuery({
-    queryKey: ["peminjaman-list"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("peminjaman")
-        .select('*, peminjam:peminjam_id(nama, kode_peminjam), detail_peminjaman!detail_peminjaman_peminjaman_id_fkey(jumlah, buku:buku_id(judul))')
-        .order("created_at", {ascending:false});
-      console.log("PEMINJAMAN RAW", JSON.stringify(data, null, 2));
-      if (error) throw error;
-      
-      return (data as any[]) ?? [];
-    },
-  });
+  queryKey: ["peminjaman-list"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("peminjaman")
+      .select('*, peminjam:peminjam_id(nama, kode_peminjam), detail_peminjaman!detail_peminjaman_peminjaman_id_fkey(jumlah, buku:buku_id(judul))')
+      .order("created_at", {ascending:false});
+
+    console.log(
+      "PEMINJAMAN RAW",
+      JSON.stringify(data, null, 2)
+    );
+
+    if (error)
+      throw error;
+
+    return (data as any[]) ?? [];
+  },
+});
 
  const { data: peminjamOpts = [] } = useQuery({
   queryKey: ["peminjam-options"],
