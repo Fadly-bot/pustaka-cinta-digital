@@ -51,8 +51,9 @@ function PengembalianPage() {
       .eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Buku telah dikembalikan");
-    await qc.invalidateQueries({ queryKey: ["pengembalian-list"] });
-    await qc.refetchQueries({ queryKey: ["pengembalian-list"], type: "active" });
+    await qc.invalidateQueries();
+    await qc.refetchQueries();
+    window.location.reload();
     qc.invalidateQueries({ queryKey: ["peminjaman-list"] });
     qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
     qc.invalidateQueries({ queryKey: ["buku"] });
