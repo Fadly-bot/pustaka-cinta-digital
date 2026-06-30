@@ -28,6 +28,8 @@ function PengembalianPage() {
         .in("status", ["Dipinjam", "Terlambat"])
         .order("tanggal_kembali");
       const { data, error } = await q;
+      console.log("RAW PENGEMBALIAN", data);
+      console.log("QUERY ERROR", error);
       if (error) throw error;
       const filtered = (data ?? []).filter((p) => {
         if (!search.trim()) return true;
