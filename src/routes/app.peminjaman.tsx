@@ -49,20 +49,30 @@ function PeminjamanPage() {
   const { data: list, isLoading } = useQuery({
   queryKey: ["peminjaman-list"],
   queryFn: async () => {
-    const { data, error } = await supabase
+    const { data: pinj, error } = await supabase
       .from("peminjaman")
-      .select('*, peminjam:peminjam_id(nama, kode_peminjam), detail_peminjaman!detail_peminjaman_peminjaman_id_fkey(jumlah, buku:buku_id(judul))')
-      .order("created_at", {ascending:false});
-
-    console.log(
-      "PEMINJAMAN RAW",
-      JSON.stringify(data, null, 2)
-    );
-
-    if (error)
-      throw error;
-
-    return (data as any[]) ?? [];
+      .select("*, peminjam:peminjam_id(nama, kode_peminjam)")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    const rows = (pinj as any[]) ?? [];
+    if (rows.length === 0) return rows;
+    const ids = rows.map((r) => r.id);
+    const { data: details } = await supabase
+      .from("detail_peminjaman")
+      .select("peminjaman_id, buku_id, jumlah")
+      .in("peminjaman_id", ids);
+    const bukuIds = Array.from(new Set((details ?? []).map((d: any) => d.buku_id)));
+    const { data: bukus } = bukuIds.length
+      ? await supabase.from("buku").select("id, judul, kode_buku").in("id", bukuIds)
+      : { data: [] as any[] };
+    const bukuMap = new Map((bukus ?? []).map((b: any) => [b.id, b]));
+    const detailMap = new Map<string, any[]>();
+    (details ?? []).forEach((d: any) => {
+      const arr = detailMap.get(d.peminjaman_id) ?? [];
+      arr.push({ jumlah: d.jumlah, buku: bukuMap.get(d.buku_id) ?? null });
+      detailMap.set(d.peminjaman_id, arr);
+    });
+    return rows.map((r) => ({ ...r, detail_peminjaman: detailMap.get(r.id) ?? [] }));
   },
 });
 
@@ -120,7 +130,7 @@ function PeminjamanPage() {
     petugas_id: auth.user?.id ?? null,
     tanggal_pinjam: tglPinjam,
     tanggal_kembali: tglKembali,
-    status: "Dipinjam" ,
+    status: "dipinjam" as const,
     catatan: catatan || null,
   };
 
