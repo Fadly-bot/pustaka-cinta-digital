@@ -51,10 +51,11 @@ function PeminjamanPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("peminjaman")
-        .select("*, peminjam:peminjam_id(nama, kode_peminjam), detail_peminjaman(jumlah, buku:buku_id(judul))")
+        .select("*, peminjam:peminjam_id(nama, kode_peminjam), detail_peminjaman(id, buku_id, jumlah, buku(judul))")
         .order("created_at", {ascending:false});
-      if (error) throw error;
       console.log("PEMINJAMAN RAW", JSON.stringify(data, null, 2));
+      if (error) throw error;
+      
       return (data as any[]) ?? [];
     },
   });
@@ -64,10 +65,11 @@ function PeminjamanPage() {
   queryFn: async () => {
     const {data, error,} = await supabase
       .from("peminjam")
-      .select('id, tanggal_pinjam, tanggal_kembali, status, peminjam(nama, kode_peminjam), detail_peminjaman(buku_id, jumlah, buku:buku_id(judul))')
+      .select("*")
       .order( "nama");
     if (error)
       throw error;  
+    
    return data ?? [];   
    },
 });      
