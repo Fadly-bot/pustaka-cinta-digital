@@ -47,7 +47,7 @@ function PengembalianPage() {
   const kembalikan = async (id: string) => {
     const { error } = await supabase
       .from("peminjaman")
-      .update({ status: "Kembali", tanggal_dikembalikan: format(new Date(), "yyyy-MM-dd") })
+      .update({ status: "Kembali", tanggal_kembali: format(new Date(), "yyyy-MM-dd") })
       .eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Buku telah dikembalikan");
