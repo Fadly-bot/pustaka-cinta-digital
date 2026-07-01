@@ -86,6 +86,7 @@ function PeminjamanPage() {
         jumlah
       `)
       .in("peminjaman_id", ids);
+    console.log("DETAIL RAW", JSON.stringfy(details, null, 2));
 
     if (detailErr) throw detailErr;
 
@@ -159,26 +160,58 @@ function PeminjamanPage() {
       }
     );
 
-    const merged =
-      rows.map(
-        (r: any) => ({
-          ...r,
+const merged =
+rows.map(
+(r:any)=>{
 
-          detail_peminjaman:
-            detailMap.get(
-              r.id
-            ) ?? [],
-        })
-      );
+const rowDetail =
+(details ?? [])
+.filter(
+(d:any)=>
+String(
+d.peminjaman_id
+)
+===
+String(
+r.id
+)
+)
+.map(
+(d:any)=>({
 
-    console.log(
-      "FINAL DATA",
-      merged
-    );
+jumlah:
+d.jumlah,
 
-    return merged;
-  },
-});
+buku:
+bukuMap.get(
+d.buku_id
+) ?? null
+
+})
+);
+
+return {
+
+...r,
+
+detail_peminjaman:
+rowDetail
+
+};
+
+}
+);
+
+console.log(
+"MERGED PEMINJAMAN",
+JSON.stringify(
+merged,
+null,
+2
+)
+);
+
+return merged;
 
   const { data: peminjamOpts = [] } = useQuery({
     queryKey: ["peminjam-options"],
