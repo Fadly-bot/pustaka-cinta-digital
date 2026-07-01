@@ -47,58 +47,74 @@ function PeminjamanPage() {
   const [saving, setSaving] = useState(false);
 
   const { data: list, isLoading } = useQuery({
-  queryKey: ["peminjaman-list"],
-  queryFn: async () => {
-    const { data: pinj, error } = await supabase
-      .from("peminjaman")
-      .select("*, peminjam:peminjam_id(nama, kode_peminjam)")
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    const rows = (pinj as any[]) ?? [];
-    if (rows.length === 0) return rows;
-    const ids = rows.map((r) => r.id);
-    const { data: details } = await supabase
-      .from("detail_peminjaman")
-      .select("peminjaman_id, buku_id, jumlah")
-      .in("peminjaman_id", ids);
-    const bukuIds = Array.from(new Set((details ?? []).map((d: any) => d.buku_id)));
-    const { data: bukus } = bukuIds.length
-      ? await supabase.from("buku").select("id, judul, kode_buku").in("id", bukuIds)
-      : { data: [] as any[] };
-    const bukuMap = new Map((bukus ?? []).map((b: any) => [b.id, b]));
-    const detailMap = new Map<string, any[]>();
-    (details ?? []).forEach((d: any) => {
-      const arr = detailMap.get(d.peminjaman_id) ?? [];
-      arr.push({ jumlah: d.jumlah, buku: bukuMap.get(d.buku_id) ?? null });
-      detailMap.set(d.peminjaman_id, arr);
-    });
-    return rows.map((r) => ({ ...r, detail_peminjaman: detailMap.get(r.id) ?? [] }));
-  },
-});
-
- const { data: peminjamOpts = [] } = useQuery({
-  queryKey: ["peminjam-options"],
-  queryFn: async () => {
-    const {data, error,} = await supabase
-      .from("peminjam")
-      .select("*")
-      .order( "nama");
-    if (error)
-      throw error;  
-    
-   return data ?? [];   
-   },
-});      
+    queryKey: ["peminjaman-list"],
+    queryFn: async () => {
+      // STEP 1: Fetch peminjaman list
+      const { data: pinj, error } = await supabase
+        .from("peminjaman")
+        .select("*, peminjam:peminjam_id(nama, kode_peminjam)")
+        .order("created_at", { ascending: false });
       
+      if (error) throw error;
       
-       
+      const rows = (pinj as any[]) ?? [];
+      console.log("PEMINJAMAN RAW:", rows);
+      
+      if (rows.length === 0) return rows;
+      
+      const ids = rows.map((r) => r.id);
+      
+      // STEP 2: Fetch detail_peminjaman
+      const { data: details } = await supabase
+        .from("detail_peminjaman")
+        .select("peminjaman_id, buku_id, jumlah")
+        .in("peminjaman_id", ids);
+      
+      console.log("DETAIL RAW:", details);
+      
+      const bukuIds = Array.from(new Set((details ?? []).map((d: any) => d.buku_id)));
+      
+      // STEP 3: Fetch buku
+      const { data: bukus } = bukuIds.length
+        ? await supabase.from("buku").select("id, judul, kode_buku").in("id", bukuIds)
+        : { data: [] as any[] };
+      
+      console.log("BUKU FETCHED:", bukus);
+      
+      // STEP 4: Merge manual
+      const bukuMap = new Map((bukus ?? []).map((b: any) => [b.id, b]));
+      const detailMap = new Map<string, any[]>();
+      
+      (details ?? []).forEach((d: any) => {
+        const arr = detailMap.get(d.peminjaman_id) ?? [];
+        const bukuData = bukuMap.get(d.buku_id);
+        console.log(`Mapping buku_id ${d.buku_id}:`, bukuData);
+        arr.push({ jumlah: d.jumlah, buku: bukuData ?? null });
+        detailMap.set(d.peminjaman_id, arr);
+      });
+      
+      const merged = rows.map((r) => ({
+        ...r,
+        detail_peminjaman: detailMap.get(r.id) ?? [],
+      }));
+      
+      console.log("MERGED PEMINJAMAN:", merged);
+      return merged;
+    },
+  });
 
-    
+  const { data: peminjamOpts = [] } = useQuery({
+    queryKey: ["peminjam-options"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("peminjam")
+        .select("*")
+        .order("nama");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 
-    
- 
-  console.log("PEMINJAM", peminjamOpts);
-  
   const { data: bukuOpts } = useQuery({
     queryKey: ["buku-options"],
     queryFn: async () =>
@@ -114,62 +130,45 @@ function PeminjamanPage() {
     setBukuId("");
   };
 
- const submit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!peminjamId)
-    return toast.error("Pilih peminjam");
+    if (!peminjamId) return toast.error("Pilih peminjam");
 
-  if (items.length === 0)
-    return toast.error("Tambahkan minimal 1 buku");
+    if (items.length === 0) return toast.error("Tambahkan minimal 1 buku");
 
-  setSaving(true);
+    setSaving(true);
 
-  const payload = {
-    peminjam_id: peminjamId,
-    petugas_id: auth.user?.id ?? null,
-    tanggal_pinjam: tglPinjam,
-    tanggal_kembali: tglKembali,
-    status: "dipinjam" as const,
-    catatan: catatan || null,
-  };
+    const payload = {
+      peminjam_id: peminjamId,
+      petugas_id: auth.user?.id ?? null,
+      tanggal_pinjam: tglPinjam,
+      tanggal_kembali: tglKembali,
+      status: "dipinjam" as const,
+      catatan: catatan || null,
+    };
 
-  console.log("STATUS", payload.status);
-  console.log(
-    "INSERT PEMINJAMAN",
-    JSON.stringify(payload, null, 2)
-  );
-
-  console.log(
-    "ITEMS",
-    JSON.stringify(items, null, 2)
-  );
-   console.log("STATUS FINAL: ", JSON.stringify(payload.status));
-   console.log("PAYLOAD:", JSON.stringify(payload,null,2));
-
-  const {
-    data: pinj,
-    error
-  } = await supabase
-    .from("peminjaman")
-    .insert(payload)
-    .select("id")
-    .single();
-
-  console.log("INSERT ERROR", error);
+    const { data: pinj, error } = await supabase
+      .from("peminjaman")
+      .insert(payload)
+      .select("id")
+      .single();
 
     if (error || !pinj) {
       setSaving(false);
       return toast.error(error?.message ?? "Gagal");
-    };
+    }
+
     const { error: dErr } = await supabase
       .from("detail_peminjaman")
       .insert(items.map((i) => ({ peminjaman_id: pinj.id, buku_id: i.buku_id, jumlah: i.jumlah })) as never);
+
     setSaving(false);
     if (dErr) {
       await supabase.from("peminjaman").delete().eq("id", pinj.id);
       return toast.error("Gagal menyimpan detail: " + dErr.message);
     }
+
     toast.success("Peminjaman berhasil dicatat");
     setOpen(false);
     setPeminjamId("");
@@ -228,9 +227,14 @@ function PeminjamanPage() {
                         <div className="text-xs font-mono text-muted-foreground">{p.peminjam?.kode_peminjam}</div>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
-                      {p.detail_peminjaman?.length? p.detail_peminjaman.map((d:any, i:number)=>(
-                      <div key={i}>{d.buku?.judul ?? "-"} × {d.jumlah}</div>)): "-"
-                      }</td>
+                        {p.detail_peminjaman?.length
+                          ? p.detail_peminjaman.map((d: any, i: number) => (
+                              <div key={i}>
+                                {d.buku?.judul ?? "-"} × {d.jumlah}
+                              </div>
+                            ))
+                          : "-"}
+                      </td>
 
                       <td className="px-4 py-3">{format(new Date(p.tanggal_pinjam), "dd MMM yyyy")}</td>
                       <td className="px-4 py-3">{format(new Date(p.tanggal_kembali), "dd MMM yyyy")}</td>
@@ -265,10 +269,14 @@ function PeminjamanPage() {
             <div className="space-y-2">
               <Label>Peminjam</Label>
               <Select value={peminjamId} onValueChange={setPeminjamId}>
-                <SelectTrigger><SelectValue placeholder="Pilih peminjam" /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih peminjam" />
+                </SelectTrigger>
                 <SelectContent>
                   {peminjamOpts?.map((p) => (
-                    <SelectItem key={p.id} value={String(p.id)}>{p.nama} ({p.kode_peminjam})</SelectItem>
+                    <SelectItem key={p.id} value={String(p.id)}>
+                      {p.nama} ({p.kode_peminjam})
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -278,14 +286,20 @@ function PeminjamanPage() {
               <Label>Tambah Buku</Label>
               <div className="flex gap-2">
                 <Select value={bukuId} onValueChange={setBukuId}>
-                  <SelectTrigger><SelectValue placeholder="Pilih buku tersedia" /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih buku tersedia" />
+                  </SelectTrigger>
                   <SelectContent>
                     {bukuOpts?.map((b) => (
-                      <SelectItem key={b.id} value={b.id}>{b.judul} (stok {b.jumlah_tersedia})</SelectItem>
+                      <SelectItem key={b.id} value={b.id}>
+                        {b.judul} (stok {b.jumlah_tersedia})
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <Button type="button" onClick={addItem}>Tambah</Button>
+                <Button type="button" onClick={addItem}>
+                  Tambah
+                </Button>
               </div>
               {items.length > 0 && (
                 <ul className="border rounded-lg divide-y mt-2">
@@ -303,7 +317,13 @@ function PeminjamanPage() {
                         }}
                         className="w-20"
                       />
-                      <Button type="button" variant="ghost" size="icon" aria-label="Hapus buku dari daftar" onClick={() => setItems(items.filter((_, i) => i !== idx))}>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Hapus buku dari daftar"
+                        onClick={() => setItems(items.filter((_, i) => i !== idx))}
+                      >
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </li>
@@ -329,7 +349,9 @@ function PeminjamanPage() {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>Batal</Button>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Batal
+              </Button>
               <Button type="submit" disabled={saving}>
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />} Simpan
               </Button>
