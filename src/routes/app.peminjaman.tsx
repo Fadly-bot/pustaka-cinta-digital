@@ -334,40 +334,86 @@ return merged;
                 </tr>
               </thead>
               <tbody>
-                {list.map((p) => {
-                  const overdue = p.status?.tolowerCase() !== "dikembalikan" && p.tanggal_kembali < today;
-                  return (
-                    <tr key={p.id} className="border-t hover:bg-secondary/30">
-                      <td className="px-4 py-3">
-                        <div className="font-medium">{p.peminjam?.nama}</div>
-                        <div className="text-xs font-mono text-muted-foreground">{p.peminjam?.kode_peminjam}</div>
-                      </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {(p.detail_peminjaman?.length ?? 0) > 0? p.detail_peminjaman.map(
-                       (d:any)=>`${d.buku?.judul ?? "Tidak ditemukan"} × ${d.jumlah}`
-                      ).join(", "): "Data buku lama tidak tersedia"
-                     }
-                      </td>
- 
-                      <td className="px-4 py-3">{format(new Date(p.tanggal_pinjam), "dd MMM yyyy")}</td>
-                      <td className="px-4 py-3">{format(new Date(p.tanggal_kembali), "dd MMM yyyy")}</td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs capitalize ${
-                            p.status?.tolowerCase === "dikembalikan"
-                              ? "bg-secondary text-secondary-foreground"
-                              : overdue
-                                ? "bg-destructive/10 text-destructive"
-                                : "bg-primary/10 text-primary"
-                          }`}
-                        >
-                          {overdue && p.status !== "dikembalikan" ? "terlambat" : p.status}
-                        </span>
-                      </td>
-                    </tr>
-                  );
+                {list.map((p:any) => {
+                const overdue =
+                p.status?.toLowerCase() !== "dikembalikan" &&
+                p.tanggal_kembali < today;    
+                return ( 
+                <tr
+                key={p.id}
+                className="border-t hover:bg-secondary/30">
+                
+                
+                <td className="px-4 py-3">
+                <div className="font-medium">
+                {p.peminjam?.nama}
+                </div>
+                
+                <div className="text-xs font-mono text-muted-foreground">
+                {p.peminjam?.kode_peminjam}
+                </div>
+                </td>
+                
+                <td className="px-4 py-3 text-muted-foreground">
+                
+                {(p.detail_peminjaman?.length ?? 0)
+                ? p.detail_peminjaman
+                .map(
+                (d:any)=>
+                `${d?.buku?.judul ?? "Tidak ditemukan"} × ${d.jumlah}`
+                )
+                .join(", ")
+                
+                : "Data buku lama tidak tersedia"}
+                
+                </td>
+                
+                <td className="px-4 py-3">
+                {format(
+                new Date(
+                p.tanggal_pinjam
+                ),
+                "dd MMM yyyy"
+                )}
+                </td>
+                
+                <td className="px-4 py-3">
+                {format(
+                new Date(
+                p.tanggal_kembali
+                ),
+                "dd MMM yyyy"
+                )}
+                </td>
+                
+                <td className="px-4 py-3">
+                
+                <span
+                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs capitalize ${
+                p.status?.toLowerCase() === "dikembalikan"
+                ? "bg-secondary text-secondary-foreground"
+                : overdue
+                ? "bg-destructive/10 text-destructive"
+                : "bg-primary/10 text-primary"
+                }`}
+                >
+                
+                {
+                overdue
+                ? "terlambat"
+                : p.status
+                }
+                
+                </span>
+                
+                </td>
+                
+                </tr>
+                
+                );
+                
                 })}
-              </tbody>
+                </tbody>
             </table>
           )}
         </CardContent>
