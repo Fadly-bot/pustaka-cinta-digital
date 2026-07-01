@@ -26,7 +26,7 @@ function PengembalianPage() {
       const { data: pinj, error } = await supabase
         .from("peminjaman")
         .select("*, peminjam:peminjam_id(nama, kode_peminjam)")
-        .eq("status", "dipinjam")
+        .eq("status", "Dipinjam")
         .order("tanggal_kembali");
       
       if (error) throw error;
@@ -91,7 +91,7 @@ function PengembalianPage() {
   const kembalikan = async (id: string) => {
     const { error } = await supabase
       .from("peminjaman")
-      .update({ status: "dikembalikan", tanggal_dikembalikan: format(new Date(), "yyyy-MM-dd") })
+      .update({ status: "Kembali", tanggal_dikembalikan: format(new Date(), "yyyy-MM-dd") })
       .eq("id", id);
     
     if (error) return toast.error(error.message);
