@@ -71,9 +71,8 @@ const { data = [], isLoading } = useQuery({
           "detail_peminjaman"
         )
         .select(`
-          peminjaman_id,
-          buku_id,
-          jumlah
+          peminjaman_id,jumlah, buku:buku_id(id, judul)
+          
         `)
         .in(
           "peminjaman_id",
@@ -83,91 +82,36 @@ const { data = [], isLoading } = useQuery({
     if (detailErr)
       throw detailErr;
 
-    const bukuIds = [
-      ...new Set(
-        (detail ?? [])
-          .map(
-            (d:any) =>
-              d.buku_id
-          )
-          .filter(Boolean)
-      ),
-    ];
 
-    const {
-      data: buku,
-      error: bukuErr,
-    } =
-      bukuIds.length
-        ? await supabase
-            .from("buku")
-            .select(`
-              id,
-              judul
-            `)
-            .in(
-              "id",
-              bukuIds
-            )
-        : {
-            data: [],
-            error: null,
-          };
+
 
     if (bukuErr)
       throw bukuErr;
 
-    const bukuMap =
-      new Map(
-        (buku ?? []).map(
-          (b:any) => [
-            b.id,
-            b,
-          ]
-        )
-      );
 
-    const merged =
-      rows.map(
-        (r:any) => ({
-          ...r,
+  const merged =
+rows.map(
+(r:any)=>({
 
-          detail_peminjaman:
-            (detail ?? [])
-              .filter(
-                (d:any) =>
-                  String(
-                    d.peminjaman_id
-                  ) ===
-                  String(
-                    r.id
-                  )
-              )
-              .map(
-                (d:any) => ({
-                  jumlah:
-                    d.jumlah,
+...r,
 
-                  buku:
-                    bukuMap.get(
-                      d.buku_id
-                    ) ?? null,
-                })
-              ),
-        })
-      );
+detail_peminjaman:
+(detail ?? [])
+.filter(
+(d:any)=>
+String(
+d.peminjaman_id
+)
+===
+String(
+r.id
+)
+)
 
-    console.log( "LAPORAN", merged);
-    console.log("PINJAM", rows);
-    console.log("DETAIL", detail);
-    console.log("BUKU", buku);
-    consoloe.log("MERGED", merged);
-     
-    
+})
+);
 
-    return merged;
-  },
-});
+return merged;
 
   const exportCSV = () => {
     if (!data || data.length === 0) return toast.error("Tidak ada data");
@@ -264,7 +208,7 @@ const { data = [], isLoading } = useQuery({
                     <td className="px-4 py-3">{format(new Date(p.tanggal_kembali), "dd MMM yyyy")}</td>
                     <td className="px-4 py-3">{p.peminjam?.nama}</td>
                     <td className="px-4 py-3">{p.detail_peminjaman?.length?p.detail_peminjaman.map((d:any,i:number)=>(
-                      <div key={i}>{d.buku?.judul?? "Buku tidak ditemukan"}×{d.jumlah}</div>
+                      <div key={i}>{d.buku?.judul?? "Buku lama"}×{d.jumlah}</div>
                       )
                       ):"Belum ada buku"}
 
