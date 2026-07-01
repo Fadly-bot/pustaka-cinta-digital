@@ -48,6 +48,8 @@ const { data = [], isLoading } = useQuery({
             ascending: false,
           }
         );
+      console.log("PINJAM RAW", pinjam);
+      console.log("PINJAM ERROR", error);
 
     if (error) throw error;
 
