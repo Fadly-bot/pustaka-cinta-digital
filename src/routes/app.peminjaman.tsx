@@ -86,7 +86,7 @@ function PeminjamanPage() {
         jumlah
       `)
       .in("peminjaman_id", ids);
-    console.log("DETAIL RAW", JSON.stringfy(details, null, 2));
+    console.log("DETAIL RAW", JSON.stringify(detail, null, 2));
 
     if (detailErr) throw detailErr;
 
@@ -165,7 +165,7 @@ rows.map(
 (r:any)=>{
 
 const rowDetail =
-(details ?? [])
+(detail ?? [])
 .filter(
 (d:any)=>
 String(
@@ -212,6 +212,8 @@ null,
 );
 
 return merged;
+  },
+ });
 
   const { data: peminjamOpts = [] } = useQuery({
     queryKey: ["peminjam-options"],
