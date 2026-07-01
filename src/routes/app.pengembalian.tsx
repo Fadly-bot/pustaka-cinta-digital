@@ -121,7 +121,6 @@ queryKey:["pengembalian-list"]
 await qc.refetchQueries({
 queryKey:["peminjaman-list"]
 });
-  window.location.reload();
 };
     
 
