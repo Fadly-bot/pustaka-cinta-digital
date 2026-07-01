@@ -89,6 +89,7 @@ function PeminjamanPage() {
     console.log("DETAIL RAW", JSON.stringify(detail, null, 2));
 
     if (detailErr) throw detailErr;
+    console.log("DETAIL QUERY RESULT", JSON.stringify(detail, null, 2));
 
     // ambil buku
     const bukuIds = [
