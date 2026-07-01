@@ -98,7 +98,7 @@ const kembalikan = async (id: string) => {
   const { data, error } = await supabase
     .from("peminjaman")
     .update({
-      status: "Dikembalikan"
+      status: "dikembalikan"
     })
     .eq("id", id)
     .select();
@@ -112,15 +112,15 @@ const kembalikan = async (id: string) => {
   }
 
   toast.success("Buku berhasil dikembalikan");
+await qc.invalidateQueries();
 
-  await qc.invalidateQueries({
-    queryKey: ["pengembalian-list"],
-  });
+await qc.refetchQueries({
+queryKey:["pengembalian-list"]
+});
 
-  await qc.invalidateQueries({
-    queryKey: ["peminjaman-list"],
-  });
-
+await qc.refetchQueries({
+queryKey:["peminjaman-list"]
+});
   window.location.reload();
 };
     
