@@ -32,7 +32,7 @@ const { data, isLoading } = useQuery({
           kode_peminjam
         )
       `)
-      .eq("status", "Dipinjam")
+      .neq("status", "Dikembalikan")
       .order("tanggal_kembali");
 
     if (error) throw error;
@@ -91,15 +91,38 @@ const { data, isLoading } = useQuery({
   },
 });
 
-  const kembalikan = async (id: string) => {
-    const { error } = await supabase
-      .from("peminjaman")
-      .update({ status: "Dikembalikan" })
-      .eq("id", id);
-    
-    if (error) return toast.error(error.message);
-    
-    toast.success("Buku telah dikembalikan");
+ const kembalikan = async (id: string) => {
+
+  const { error } = await supabase
+    .from("peminjaman")
+    .update({
+      status: "Dikembalikan"
+    })
+    .eq("id", id);
+
+  if (error) {
+    toast.error(error.message);
+    return;
+  }
+
+  toast.success("Buku berhasil dikembalikan");
+
+  await qc.invalidateQueries({
+    queryKey: ["pengembalian-list"]
+  });
+
+  await qc.invalidateQueries({
+    queryKey: ["peminjaman-list"]
+  });
+
+  await qc.refetchQueries({
+    queryKey: ["pengembalian-list"]
+  });
+
+  await qc.refetchQueries({
+    queryKey: ["peminjaman-list"]
+  });
+};
     
     // Invalidate all related queries
     await qc.invalidateQueries({ queryKey: ["pengembalian-list"] });
