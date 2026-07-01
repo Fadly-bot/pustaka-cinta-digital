@@ -134,6 +134,7 @@ console.log("LAPORAN RAW", rows);
       );
       console.log("LAPORAN MERGED",merged);
       return merged;
+    },});
 
   const exportCSV = () => {
     if (!data || data.length === 0) return toast.error("Tidak ada data");
@@ -229,58 +230,17 @@ console.log("LAPORAN RAW", rows);
                     <td className="px-4 py-3">{format(new Date(p.tanggal_pinjam), "dd MMM yyyy")}</td>
                     <td className="px-4 py-3">{format(new Date(p.tanggal_kembali), "dd MMM yyyy")}</td>
                     <td className="px-4 py-3">{p.peminjam?.nama}</td>
+                    <td className="px-4 py-3">{p.detail_peminjaman?.length?p.detail_peminjaman.map((d:any,i:number)=>(
+                      <div key={i}>{d.buku?.judul?? "Buku tidak ditemukan"}×{d.jumlah}</div>
+                      )
+                      ):"Belum ada buku"}
+
+                    </td>
                     <td className="px-4 py-3">
+                      <span className={p.status === "Kembali"? "text-green-600": "text-blue-600"}>
+                      {p.status}</span>
+                    </td>
 
-{
-p.detail_peminjaman?.length
-?
-
-p.detail_peminjaman.map(
-(
-d:any,
-i:number
-)=>(
-
-<div key={i}>
-
-{
-d.buku?.judul
-?? "Buku tidak ditemukan"
-}
-
-×
-
-{
-d.jumlah
-}
-
-</div>
-
-)
-)
-
-:
-
-"Belum ada buku"
-
-}
-
-</td>
-                    <td className="px-4 py-3">
-
-<span
-className={
-p.status === "Kembali"
-? "text-green-600"
-: "text-blue-600"
-}
->
-
-{p.status}
-
-</span>
-
-</td>
                   </tr>
                 ))}
               </tbody>
@@ -290,4 +250,4 @@ p.status === "Kembali"
       </Card>
     </div>
   );
-}
+
