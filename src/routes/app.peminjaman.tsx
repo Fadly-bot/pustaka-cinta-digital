@@ -144,13 +144,16 @@ function PeminjamanPage() {
       petugas_id: auth.user?.id ?? null,
       tanggal_pinjam: tglPinjam,
       tanggal_kembali: tglKembali,
-      status: "dipinjam" as const,
+      status: "Dipinjam" .trim(),
       catatan: catatan || null,
     };
+    console.log("STATUS FINAL", JSON.stringify(payload.status));
+    console.log("INSERT PEMINJAMAN", JSON.stringify(payload, null, 2));
+    console.log("ITEMS", JSON.stringify(items, null, 2));
 
     const { data: pinj, error } = await supabase
       .from("peminjaman")
-      .insert(payload)
+      .insert([payload])
       .select("id")
       .single();
 
