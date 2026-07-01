@@ -100,7 +100,7 @@ const kembalikan = async (id: string) => {
     await supabase
       .from("peminjaman")
       .update({
-        status: "kembali"
+        status: "Kembali"
       })
       .eq("id", id)
       .select();
