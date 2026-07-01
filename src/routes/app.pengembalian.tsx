@@ -93,34 +93,65 @@ const { data, isLoading } = useQuery({
 
 const kembalikan = async (id: string) => {
 
-  console.log("ID DIKEMBALIKAN:", id);
+console.log("ID DIKEMBALIKAN", id);
 
-  const { data, error } = await supabase
-    .from("peminjaman")
-    .update({
-      status: "dikembalikan"
-    })
-    .eq("id", id)
-    .select();
+const {
+data,
+error,
+} =
+await supabase
+.from("peminjaman")
+.update({
+status:
+"dikembalikan",
+})
+.eq(
+"id",
+id
+)
+.select();
 
-  console.log("UPDATE RESULT:", data);
+console.log(
+"UPDATE RESULT",
+data
+);
 
-  if (error) {
-    console.log(error);
-    toast.error(error.message);
-    return;
-  }
+console.log(
+"UPDATE ERROR",
+error
+);
 
-  toast.success("Buku berhasil dikembalikan");
-await qc.invalidateQueries();
+if (error) {
+toast.error(
+error.message
+);
+return;
+}
 
-await qc.refetchQueries({
-queryKey:["pengembalian-list"]
+toast.success(
+"Buku berhasil dikembalikan"
+);
+
+await qc.invalidateQueries({
+queryKey:
+["pengembalian-list"]
+});
+
+await qc.invalidateQueries({
+queryKey:
+["peminjaman-list"]
 });
 
 await qc.refetchQueries({
-queryKey:["peminjaman-list"]
+queryKey:
+["pengembalian-list"]
 });
+
+await qc.refetchQueries({
+queryKey:
+["peminjaman-list"]
+});
+
 };
     
 
