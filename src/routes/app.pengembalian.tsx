@@ -22,42 +22,68 @@ function PengembalianPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["pengembalian-list", search],
     queryFn: async () => {
+      // STEP 1: Fetch peminjaman with status = "dipinjam"
       const { data: pinj, error } = await supabase
         .from("peminjaman")
         .select("*, peminjam:peminjam_id(nama, kode_peminjam)")
         .eq("status", "dipinjam")
         .order("tanggal_kembali");
+      
       if (error) throw error;
+      
       const rows = (pinj as any[]) ?? [];
+      console.log("PENGEMBALIAN RAW:", rows);
+      
       let merged: any[] = rows;
+      
       if (rows.length) {
         const ids = rows.map((r) => r.id);
+        
+        // STEP 2: Fetch detail_peminjaman
         const { data: details } = await supabase
           .from("detail_peminjaman")
           .select("peminjaman_id, buku_id, jumlah")
           .in("peminjaman_id", ids);
+        
+        console.log("DETAIL RAW:", details);
+        
         const bukuIds = Array.from(new Set((details ?? []).map((d: any) => d.buku_id)));
+        
+        // STEP 3: Fetch buku
         const { data: bukus } = bukuIds.length
           ? await supabase.from("buku").select("id, judul, kode_buku").in("id", bukuIds)
           : { data: [] as any[] };
+        
+        console.log("BUKU FETCHED:", bukus);
+        
+        // STEP 4: Merge manual
         const bukuMap = new Map((bukus ?? []).map((b: any) => [b.id, b]));
         const detailMap = new Map<string, any[]>();
+        
         (details ?? []).forEach((d: any) => {
           const arr = detailMap.get(d.peminjaman_id) ?? [];
           arr.push({ jumlah: d.jumlah, buku: bukuMap.get(d.buku_id) ?? null });
           detailMap.set(d.peminjaman_id, arr);
         });
+        
         merged = rows.map((r) => ({ ...r, detail_peminjaman: detailMap.get(r.id) ?? [] }));
       }
+      
+      console.log("MERGED PENGEMBALIAN:", merged);
+      
+      // STEP 5: Filter by search
       const filtered = merged.filter((p) => {
         if (!search.trim()) return true;
         const s = search.toLowerCase();
-        const matchPem = (p.peminjam?.nama ?? "").toLowerCase().includes(s) || (p.peminjam?.kode_peminjam ?? "").toLowerCase().includes(s);
-        const matchBuk = p.detail_peminjaman?.some((d:any) =>
+        const matchPem =
+          (p.peminjam?.nama ?? "").toLowerCase().includes(s) ||
+          (p.peminjam?.kode_peminjam ?? "").toLowerCase().includes(s);
+        const matchBuk = p.detail_peminjaman?.some((d: any) =>
           (d.buku?.judul ?? "").toLowerCase().includes(s)
         );
         return matchPem || matchBuk;
       });
+      
       return filtered;
     },
   });
@@ -67,8 +93,12 @@ function PengembalianPage() {
       .from("peminjaman")
       .update({ status: "dikembalikan", tanggal_dikembalikan: format(new Date(), "yyyy-MM-dd") })
       .eq("id", id);
+    
     if (error) return toast.error(error.message);
+    
     toast.success("Buku telah dikembalikan");
+    
+    // Invalidate all related queries
     await qc.invalidateQueries({ queryKey: ["pengembalian-list"] });
     await qc.refetchQueries({ queryKey: ["pengembalian-list"], type: "active" });
     qc.invalidateQueries({ queryKey: ["peminjaman-list"] });
@@ -79,10 +109,18 @@ function PengembalianPage() {
 
   return (
     <div>
-      <PageHeader title="Pengembalian Buku" description="Daftar peminjaman aktif. Klik kembalikan untuk memproses pengembalian." />
+      <PageHeader
+        title="Pengembalian Buku"
+        description="Daftar peminjaman aktif. Klik kembalikan untuk memproses pengembalian."
+      />
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Cari kode buku, kode peminjam, atau nama..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+        <Input
+          placeholder="Cari kode buku, kode peminjam, atau nama..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9"
+        />
       </div>
       <Card>
         <CardContent className="p-0 overflow-x-auto">
@@ -113,12 +151,16 @@ function PengembalianPage() {
                     <tr key={p.id} className="border-t hover:bg-secondary/30">
                       <td className="px-4 py-3">
                         <div className="font-medium">{p.peminjam?.nama}</div>
-                        <div className="text-xs font-mono text-muted-foreground">{p.peminjam?.kode_peminjam}</div>
+                        <div className="text-xs font-mono text-muted-foreground">
+                          {p.peminjam?.kode_peminjam}
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
                         {p.detail_peminjaman?.length
                           ? p.detail_peminjaman.map((d: any, i: number) => (
-                              <div key={i}>{d.buku?.judul ?? "-"} × {d.jumlah}</div>
+                              <div key={i}>
+                                {d.buku?.judul ?? "-"} × {d.jumlah}
+                              </div>
                             ))
                           : "-"}
                       </td>
