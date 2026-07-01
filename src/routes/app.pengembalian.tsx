@@ -152,7 +152,7 @@ status:
 "id",
 cek.id
 )
-  .ilike("status", "dipinjam")
+
 .select('id, status');
 
 console.log(
