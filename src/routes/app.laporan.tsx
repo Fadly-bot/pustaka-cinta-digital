@@ -24,33 +24,15 @@ function LaporanPage() {
     queryKey: ["laporan", from, to],
     queryFn: async () => {
 
-const { data: pinjam, error } =
-await supabase
-.from("peminjaman")
-.select(`
-*,
-peminjam:peminjam_id(
-nama,
-kode_peminjam
-)
-`)
-.gte(
-"tanggal_pinjam",
-from
-)
-.lte(
-"tanggal_pinjam",
-to
-)
-.order(
-"tanggal_pinjam",
-{
-ascending:false
-}
-);
-
-if (error)
-throw error;
+    const { data: pinjam, error } =
+    await supabase
+    .from("peminjaman")
+    .select(`*,peminjam:peminjam_id(nama,kode_peminjam)`)
+    .gte("crated_at", from + "T00:00:00")
+    .lte("created_at", to + "T23:59:59")
+    .order("tanggal_pinjam",{ascending:false});
+    if (error)
+    throw error;
 
 const rows =
 pinjam ?? [];
