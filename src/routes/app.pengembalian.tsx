@@ -19,79 +19,82 @@ function PengembalianPage() {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["pengembalian-list", search],
-    queryFn: async () => {
-      // STEP 1: Fetch peminjaman with status = "dipinjam"
-      const { data: pinj, error } = await supabase
-        .from("peminjaman")
-        .select("*, peminjam:peminjam_id(nama, kode_peminjam)")
-        .eq("status", "Dipinjam")
-        .order("tanggal_kembali");
-      
-      if (error) throw error;
-      
-      const rows = (pinj as any[]) ?? [];
-      console.log("PENGEMBALIAN RAW:", rows);
-      
-      let merged: any[] = rows;
-      
-      if (rows.length) {
-        const ids = rows.map((r) => r.id);
-        
-        // STEP 2: Fetch detail_peminjaman
-        const { data: details } = await supabase
-          .from("detail_peminjaman")
-          .select("peminjaman_id, buku_id, jumlah")
-          .in("peminjaman_id", ids);
-        
-        console.log("DETAIL RAW:", details);
-        
-        const bukuIds = Array.from(new Set((details ?? []).map((d: any) => d.buku_id)));
-        
-        // STEP 3: Fetch buku
-        const { data: bukus } = bukuIds.length
-          ? await supabase.from("buku").select("id, judul, kode_buku").in("id", bukuIds)
-          : { data: [] as any[] };
-        
-        console.log("BUKU FETCHED:", bukus);
-        
-        // STEP 4: Merge manual
-        const bukuMap = new Map((bukus ?? []).map((b: any) => [b.id, b]));
-        const detailMap = new Map<string, any[]>();
-        
-        (details ?? []).forEach((d: any) => {
-          const arr = detailMap.get(d.peminjaman_id) ?? [];
-          arr.push({ jumlah: d.jumlah, buku: bukuMap.get(d.buku_id) ?? null });
-          detailMap.set(d.peminjaman_id, arr);
-        });
-        
-        merged = rows.map((r) => ({ ...r, detail_peminjaman: detailMap.get(r.id) ?? [] }));
-      }
-      
-      console.log("MERGED PENGEMBALIAN:", merged);
-      
-      // STEP 5: Filter by search
-      const filtered = merged.filter((p) => {
-        if (!search.trim()) return true;
-        const s = search.toLowerCase();
-        const matchPem =
-          (p.peminjam?.nama ?? "").toLowerCase().includes(s) ||
-          (p.peminjam?.kode_peminjam ?? "").toLowerCase().includes(s);
-        const matchBuk = p.detail_peminjaman?.some((d: any) =>
-          (d.buku?.judul ?? "").toLowerCase().includes(s)
-        );
-        return matchPem || matchBuk;
-      });
-      
-      return filtered;
-    },
-  });
+const { data, isLoading } = useQuery({
+  queryKey: ["pengembalian-list", search],
+
+  queryFn: async () => {
+    const { data: pinjam, error } = await supabase
+      .from("peminjaman")
+      .select(`
+        *,
+        peminjam:peminjam_id(
+          nama,
+          kode_peminjam
+        )
+      `)
+      .eq("status", "Dipinjam")
+      .order("tanggal_kembali");
+
+    if (error) throw error;
+
+    if (!pinjam?.length) return [];
+
+    const ids = pinjam.map((p) => p.id);
+
+    const {
+      data: detail,
+      error: detailErr,
+    } = await supabase
+      .from("detail_peminjaman")
+      .select(`
+        peminjaman_id,
+        jumlah,
+        buku:buku_id(
+          judul
+        )
+      `)
+      .in("peminjaman_id", ids);
+
+    if (detailErr) throw detailErr;
+
+    const merged = pinjam.map((p) => ({
+      ...p,
+      detail_peminjaman:
+        (detail ?? []).filter(
+          (d:any) =>
+            d.peminjaman_id === p.id
+        ),
+    }));
+
+    return merged.filter((p:any) => {
+      if (!search.trim()) return true;
+
+      const s = search.toLowerCase();
+
+      return (
+        p.peminjam?.nama
+          ?.toLowerCase()
+          .includes(s) ||
+
+        p.peminjam?.kode_peminjam
+          ?.toLowerCase()
+          .includes(s) ||
+
+        p.detail_peminjaman?.some(
+          (d:any)=>
+            d.buku?.judul
+              ?.toLowerCase()
+              ?.includes(s)
+        )
+      );
+    });
+  },
+});
 
   const kembalikan = async (id: string) => {
     const { error } = await supabase
       .from("peminjaman")
-      .update({ status: "Kembali", tanggal_dikembalikan: format(new Date(), "yyyy-MM-dd") })
+      .update({ status: "Dikembalikan" })
       .eq("id", id);
     
     if (error) return toast.error(error.message);
@@ -155,15 +158,13 @@ function PengembalianPage() {
                           {p.peminjam?.kode_peminjam}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">
-                        {p.detail_peminjaman?.length
-                          ? p.detail_peminjaman.map((d: any, i: number) => (
-                              <div key={i}>
-                                {d.buku?.judul ?? "-"} × {d.jumlah}
-                              </div>
-                            ))
-                          : "-"}
-                      </td>
+                      <td className="px-4 py-3">
+                      {p.detail_peminjaman?.length ? p.detail_peminjaman.map((d:any,i:number)=>(
+                        <div key={i}>{d.buku?.judul || "Data buku lama"} × {d.jumlah}</div>
+                         ) ) : "Belum ada buku"
+                        }      
+                       </td>          
+
                       <td className="px-4 py-3">{format(new Date(p.tanggal_kembali), "dd MMM yyyy")}</td>
                       <td className="px-4 py-3">
                         {days > 0 ? (
