@@ -123,39 +123,18 @@ b
 ]
 )
 );
+console.log("LAPORAN RAW", rows);
+      console.log("DETAIL", detail);
+      console.log("BUKU", buku);
+      
+    const merged =rows.map((r:any)=>({...r,detail_peminjaman:(detail??[])
+      .filter((d:any)=>String(d.peminjaman_id)===String(r.id))
+      .map((d:any)=>({jumlah:d.jumlah,buku:bukuMap.get(d.buku_id)?? null}))
+      })
+      );
+      console.log("LAPORAN MERGED",merged);
+      return merged;
 
-return rows.map(
-(r:any)=>({
-
-...r,
-
-detail_peminjaman:
-(detail ?? [])
-.filter(
-(d:any)=>
-String(d.peminjaman_id) === String(r.id)
-)
-.map(
-(d:any)=>({
-
-jumlah:d.jumlah,
-
-buku:
-bukuMap.get(
-d.buku_id
-) ?? null
-
-})
-
-)
-
-})
-
-);
-
-},
-
-});
   const exportCSV = () => {
     if (!data || data.length === 0) return toast.error("Tidak ada data");
     const rows = [["Tanggal Pinjam", "Tanggal Kembali", "Peminjam", "Kode Peminjam", "Buku", "Status"]];
