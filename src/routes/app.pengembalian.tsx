@@ -91,25 +91,17 @@ const { data, isLoading } = useQuery({
   },
 });
 
-const kembalikan = async (id: string) => {
+    const kembalikan = async (id: string) => {
 
-console.log("ID DIKEMBALIKAN", id);
-
-const {
-data,
-error,
-} =
-await supabase
-.from("peminjaman")
-.update({
-status:
-"dikembalikan",
-})
-.eq(
-"id",
-id
-)
-.select();
+    console.log("ID DIKEMBALIKAN", id);
+    console.log("ID MASUK", id);
+      console.log("TYPE", typeof id);
+      
+    const {data,error,} =await supabase
+      .from("peminjaman")
+      .update({status:"dikembalikan"})
+      .eq("id",String(id))
+      .select();
 
 console.log(
 "UPDATE RESULT",
@@ -154,7 +146,6 @@ queryKey:
 
 };
     
-
   return (
     <div>
       <PageHeader
@@ -219,7 +210,7 @@ queryKey:
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <Button size="sm" onClick={() => kembalikan(p.id)}>
+                        <Button size="sm" onClick={() => kembalikan(String(p.id))}>
                           <Undo2 className="h-4 w-4" /> Kembalikan
                         </Button>
                       </td>
