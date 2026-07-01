@@ -124,14 +124,6 @@ const { data, isLoading } = useQuery({
   });
 };
     
-    // Invalidate all related queries
-    await qc.invalidateQueries({ queryKey: ["pengembalian-list"] });
-    await qc.refetchQueries({ queryKey: ["pengembalian-list"], type: "active" });
-    qc.invalidateQueries({ queryKey: ["peminjaman-list"] });
-    qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
-    qc.invalidateQueries({ queryKey: ["buku"] });
-    qc.invalidateQueries({ queryKey: ["buku-options"] });
-  };
 
   return (
     <div>
