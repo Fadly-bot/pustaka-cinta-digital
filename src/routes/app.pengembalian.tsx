@@ -152,7 +152,8 @@ status:
 "id",
 cek.id
 )
-.select();
+  .ilike("status", "dipinjam")
+.select('id, status');
 
 console.log(
 "UPDATE RESULT",
@@ -163,6 +164,8 @@ console.log(
 "UPDATE ERROR",
 error
 );
+  if(!data?.legth){toast.error("Status tidak berubah");
+                   return;}
 
 if(error){
 toast.error(
