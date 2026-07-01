@@ -103,8 +103,7 @@ const { data = [], isLoading } = useQuery({
             .from("buku")
             .select(`
               id,
-              judul,
-              kode_buku
+              judul
             `)
             .in(
               "id",
@@ -158,10 +157,13 @@ const { data = [], isLoading } = useQuery({
         })
       );
 
-    console.log(
-      "LAPORAN",
-      merged
-    );
+    console.log( "LAPORAN", merged);
+    console.log("PINJAM", rows);
+    console.log("DETAIL", detail);
+    console.log("BUKU", buku);
+    consoloe.log("MERGED", merged);
+     
+    
 
     return merged;
   },
