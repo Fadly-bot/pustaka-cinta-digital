@@ -46,62 +46,139 @@ function PeminjamanPage() {
   const [catatan, setCatatan] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const { data: list, isLoading } = useQuery({
-    queryKey: ["peminjaman-list"],
-    queryFn: async () => {
-      // STEP 1: Fetch peminjaman list
-      const { data: pinj, error } = await supabase
-        .from("peminjaman")
-        .select("*, peminjam:peminjam_id(nama, kode_peminjam)")
-        .order("created_at", { ascending: false });
-      
-      if (error) throw error;
-      
-      const rows = (pinj as any[]) ?? [];
-      console.log("PEMINJAMAN RAW:", rows);
-      
-      if (rows.length === 0) return rows;
-      
-      const ids = rows.map((r) => r.id);
-      
-      // STEP 2: Fetch detail_peminjaman
-      const { data: details } = await supabase
-        .from("detail_peminjaman")
-        .select("peminjaman_id, buku_id, jumlah")
-        .in("peminjaman_id", ids);
-      
-      console.log("DETAIL RAW:", details);
-      
-      const bukuIds = Array.from(new Set((details ?? []).map((d: any) => d.buku_id)));
-      
-      // STEP 3: Fetch buku
-      const { data: bukus } = bukuIds.length
-        ? await supabase.from("buku").select("id, judul, kode_buku").in("id", bukuIds)
-        : { data: [] as any[] };
-      
-      console.log("BUKU FETCHED:", bukus);
-      
-      // STEP 4: Merge manual
-      const bukuMap = new Map((bukus ?? []).map((b: any) => [b.id, b]));
-      const detailMap = new Map<string, any[]>();
-      
-      (details ?? []).forEach((d: any) => {
-        const arr = detailMap.get(d.peminjaman_id) ?? [];
-        const bukuData = bukuMap.get(d.buku_id);
-        console.log(`Mapping buku_id ${d.buku_id}:`, bukuData);
-        arr.push({ jumlah: d.jumlah, buku: bukuData ?? null });
-        detailMap.set(d.peminjaman_id, arr);
+ const { data: list = [], isLoading } = useQuery({
+  queryKey: ["peminjaman-list"],
+
+  queryFn: async () => {
+    // ambil header peminjaman
+    const { data: pinjam, error } = await supabase
+      .from("peminjaman")
+      .select(`
+        *,
+        peminjam:peminjam_id(
+          nama,
+          kode_peminjam
+        )
+      `)
+      .order("created_at", {
+        ascending: false,
       });
-      
-      const merged = rows.map((r) => ({
-        ...r,
-        detail_peminjaman: detailMap.get(r.id) ?? [],
-      }));
-      
-      console.log("MERGED PEMINJAMAN:", merged);
-      return merged;
-    },
-  });
+
+    if (error) throw error;
+
+    const rows = pinjam ?? [];
+
+    if (!rows.length) {
+      return [];
+    }
+
+    // ambil detail
+    const ids = rows.map((x) => x.id);
+
+    const {
+      data: detail,
+      error: detailErr,
+    } = await supabase
+      .from("detail_peminjaman")
+      .select(`
+        peminjaman_id,
+        buku_id,
+        jumlah
+      `)
+      .in("peminjaman_id", ids);
+
+    if (detailErr) throw detailErr;
+
+    // ambil buku
+    const bukuIds = [
+      ...new Set(
+        (detail ?? [])
+          .map((d: any) => d.buku_id)
+          .filter(Boolean)
+      ),
+    ];
+
+    const {
+      data: buku,
+      error: bukuErr,
+    } =
+      bukuIds.length > 0
+        ? await supabase
+            .from("buku")
+            .select(`
+              id,
+              judul
+            `)
+            .in("id", bukuIds)
+        : {
+            data: [],
+            error: null,
+          };
+
+    if (bukuErr) throw bukuErr;
+
+    const bukuMap = new Map(
+      (buku ?? []).map((b: any) => [
+        b.id,
+        b,
+      ])
+    );
+
+    const detailMap =
+      new Map();
+
+    (detail ?? []).forEach(
+      (d: any) => {
+        if (
+          !detailMap.has(
+            d.peminjaman_id
+          )
+        ) {
+          detailMap.set(
+            d.peminjaman_id,
+            []
+          );
+        }
+
+        detailMap
+          .get(
+            d.peminjaman_id
+          )
+          .push({
+            jumlah:
+              d.jumlah,
+
+            buku:
+              bukuMap.get(
+                d.buku_id
+              ) ?? {
+                judul:
+                  "Buku tidak ditemukan",
+              },
+          });
+      }
+    );
+
+    const merged =
+      rows.map(
+        (r: any) => ({
+          ...r,
+
+          detail_peminjaman:
+            detailMap.get(
+              r.id
+            ) ?? [],
+        })
+      );
+
+    console.log(
+      "FINAL DATA",
+      merged
+    );
+
+    return merged;
+  },
+});
 
   const { data: peminjamOpts = [] } = useQuery({
     queryKey: ["peminjam-options"],
@@ -229,14 +306,10 @@ function PeminjamanPage() {
                         <div className="font-medium">{p.peminjam?.nama}</div>
                         <div className="text-xs font-mono text-muted-foreground">{p.peminjam?.kode_peminjam}</div>
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">
-                        {p.detail_peminjaman?.length
-                          ? p.detail_peminjaman.map((d: any, i: number) => (
-                              <div key={i}>
-                                {d.buku?.judul ?? "-"} × {d.jumlah}
-                              </div>
-                            ))
-                          : "-"}
+                     <td className="px-4 py-3 text-muted-foreground">
+                      {p.detail_peminjaman?.length? p.detail_peminjaman.map((d:any)=>
+                      `${d?.buku?.judul || "Buku tidak ditemukan"} × ${d.jumlah}`)
+                      .join(", "): "Belum ada buku" }
                       </td>
 
                       <td className="px-4 py-3">{format(new Date(p.tanggal_pinjam), "dd MMM yyyy")}</td>
