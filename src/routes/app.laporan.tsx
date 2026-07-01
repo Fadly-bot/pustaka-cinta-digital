@@ -101,27 +101,45 @@ const { data, isLoading } = useQuery({
       if (detailErr)
         throw detailErr;
 
-      const merged =
-        rows.map(
-          (r:any)=>({
+     const merged =
+rows.map(
+(r:any)=>{
 
-            ...r,
+const rowDetail =
+(detail ?? [])
+.filter(
+(d:any)=>
+String(
+d.peminjaman_id
+)
+===
+String(
+r.id
+)
+);
 
-            detail_peminjaman:
-              (detail ?? [])
-              .filter(
-                (d:any)=>
-                String(d.peminjaman_id)
-                ===
-                String(r.id)
-              )
+return {
 
-          })
-        );
+...r,
 
-      console.log("MERGED =", merged);
+detail_peminjaman:
+rowDetail
 
-      return merged;
+};
+
+}
+);
+
+console.log(
+"MERGED =",
+JSON.stringify(
+merged,
+null,
+2
+)
+);
+
+return merged;
 
     }
 
