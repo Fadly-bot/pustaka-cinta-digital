@@ -27,12 +27,12 @@ function DashboardPage() {
       const today = new Date().toISOString().slice(0, 10);
       const [bukuRes, dipinjamRes, peminjamRes, terlambatRes, peminjamanRes] = await Promise.all([
         supabase.from("buku").select("jumlah_total", { count: "exact", head: false }),
-        supabase.from("peminjaman").select("id", { count: "exact", head: true }).eq("status", "dipinjam"),
+        supabase.from("peminjaman").select("id", { count: "exact", head: true }).eq("status", "Dipinjam"),
         supabase.from("peminjam").select("id", { count: "exact", head: true }),
         supabase
           .from("peminjaman")
           .select("id", { count: "exact", head: true })
-          .neq("status", "dikembalikan")
+          .or(`status.eq.Dipinjam, status.eq.Terlambat`)
           .lt("tanggal_kembali", today),
         supabase
           .from("peminjaman")
@@ -58,6 +58,8 @@ function DashboardPage() {
         date: format(new Date(date), "dd/MM"),
         total,
       }));
+      console.log("DASHBOARD DIPINJAM", dipinjamRes.count);
+      console.log("DASHBOARD TERLAMBAT", terlambatRes.count);
 
       return {
         totalBuku,
