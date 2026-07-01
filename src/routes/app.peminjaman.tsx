@@ -342,12 +342,13 @@ return merged;
                         <div className="font-medium">{p.peminjam?.nama}</div>
                         <div className="text-xs font-mono text-muted-foreground">{p.peminjam?.kode_peminjam}</div>
                       </td>
-                     <td className="px-4 py-3 text-muted-foreground">
-                      {p.detail_peminjaman?.length? p.detail_peminjaman.map((d:any)=>
-                      `${d?.buku?.judul || "Buku tidak ditemukan"} × ${d.jumlah}`)
-                      .join(", "): "Belum ada buku" }
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {(p.detail_peminjaman?.length ?? 0) > 0? p.detail_peminjaman.map(
+                       (d:any)=>`${d.buku?.judul ?? "Tidak ditemukan"} × ${d.jumlah}`
+                      ).join(", "): "Data buku lama tidak tersedia"
+                     }
                       </td>
-
+ 
                       <td className="px-4 py-3">{format(new Date(p.tanggal_pinjam), "dd MMM yyyy")}</td>
                       <td className="px-4 py-3">{format(new Date(p.tanggal_kembali), "dd MMM yyyy")}</td>
                       <td className="px-4 py-3">
