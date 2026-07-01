@@ -93,103 +93,48 @@ const { data, isLoading } = useQuery({
 
 const kembalikan = async (id: string) => {
 
-console.log(
-"ID DITERIMA",
-id
-);
+  console.log("ID DIKLIK", id);
 
-const {
-data: cek,
-error: cekErr
-} =
-await supabase
-.from(
-"peminjaman"
-)
-.select(`
-id,
-status
-`)
-.eq(
-"id",
-id
-)
-.single();
+  // update TANPA filter status
+  const { data, error } =
+    await supabase
+      .from("peminjaman")
+      .update({
+        status: "dikembalikan"
+      })
+      .eq("id", id)
+      .select();
 
-console.log(
-"CEK DATA",
-cek
-);
+  console.log("UPDATE DATA", data);
+  console.log("UPDATE ERROR", error);
 
-console.log(
-"CEK ERROR",
-cekErr
-);
+  if (error) {
+    toast.error(error.message);
+    return;
+  }
 
-if (
-cekErr ||
-!cek
-){
-toast.error(
-"Data peminjaman tidak ditemukan"
-);
-return;
-}
+  if (!data?.length) {
+    toast.error("Data tidak ditemukan");
+    return;
+  }
 
-const {
-data,
-error
-} =
-await supabase
-.from(
-"peminjaman"
-)
-.update({
-status:
-"dikembalikan"
-})
-.eq(
-"id",
-cek.id
-)
+  toast.success("Buku berhasil dikembalikan");
 
-.select('id, status');
+  await qc.invalidateQueries({
+    queryKey: ["pengembalian-list"],
+  });
 
-console.log(
-"UPDATE RESULT",
-data
-);
+  await qc.invalidateQueries({
+    queryKey: ["peminjaman-list"],
+  });
 
-console.log(
-"UPDATE ERROR",
-error
-);
-  if(!data?.legth){toast.error("Status tidak berubah");
-                   return;}
+  await qc.refetchQueries({
+    queryKey: ["pengembalian-list"],
+  });
 
-if(error){
-toast.error(
-error.message
-);
-return;
-}
-
-toast.success(
-"Buku berhasil dikembalikan"
-);
-
-await qc.refetchQueries({
-queryKey:[
-"pengembalian-list"
-]
-});
-
-await qc.refetchQueries({
-queryKey:[
-"peminjaman-list"
-]
-});
-
+  await qc.refetchQueries({
+    queryKey: ["peminjaman-list"],
+  });
 };
     
   return (
