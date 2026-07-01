@@ -335,7 +335,7 @@ return merged;
               </thead>
               <tbody>
                 {list.map((p) => {
-                  const overdue = p.status !== "dikembalikan" && p.tanggal_kembali < today;
+                  const overdue = p.status?.tolowerCase() !== "dikembalikan" && p.tanggal_kembali < today;
                   return (
                     <tr key={p.id} className="border-t hover:bg-secondary/30">
                       <td className="px-4 py-3">
@@ -354,7 +354,7 @@ return merged;
                       <td className="px-4 py-3">
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs capitalize ${
-                            p.status === "dikembalikan"
+                            p.status?.tolowerCase === "dikembalikan"
                               ? "bg-secondary text-secondary-foreground"
                               : overdue
                                 ? "bg-destructive/10 text-destructive"
