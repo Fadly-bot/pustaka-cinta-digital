@@ -20,136 +20,125 @@ function LaporanPage() {
   const [from, setFrom] = useState(format(startOfMonth(new Date()), "yyyy-MM-dd"));
   const [to, setTo] = useState(format(new Date(), "yyyy-MM-dd"));
 
-const { data = [], isLoading } = useQuery({
+const { data, isLoading } = useQuery({
   queryKey: ["laporan", from, to],
 
- queryFn: async () => {
+  queryFn: async () => {
 
-console.log("=== LAPORAN START ===");
+    console.log("=== LAPORAN START ===");
 
-try {
+    try {
 
-const {
-data: pinjam,
-error
-}
-=
-await supabase
-.from("peminjaman")
-.select(`
-*,
-peminjam:peminjam_id(
-nama,
-kode_peminjam
-)
-`)
-.gte(
-"created_at",
-from + "T00:00:00"
-)
-.lte(
-"created_at",
-to + "T23:59:59"
-)
-.order(
-"tanggal_pinjam",
-{
-ascending: false
-}
-);
+      const {
+        data: pinjam,
+        error
+      } =
+      await supabase
+        .from("peminjaman")
+        .select(`
+          *,
+          peminjam:peminjam_id(
+            nama,
+            kode_peminjam
+          )
+        `)
+        .gte(
+          "created_at",
+          from + "T00:00:00"
+        )
+        .lte(
+          "created_at",
+          to + "T23:59:59"
+        )
+        .order(
+          "tanggal_pinjam",
+          {
+            ascending: false
+          }
+        );
 
-console.log("PINJAM =", pinjam);
-console.log("PINJAM ERROR =", error);
+      console.log("PINJAM RAW =", pinjam);
+      console.log("PINJAM ERROR =", error);
 
-if (error)
-throw error;
+      if (error)
+        throw error;
 
-const rows =
-pinjam ?? [];
+      const rows =
+        pinjam ?? [];
 
-console.log("ROWS =", rows);
+      if (!rows.length)
+        return [];
 
-if (!rows.length) {
+      const ids =
+        rows.map(
+          (r:any)=>
+          r.id
+        );
 
-console.log("DATA KOSONG");
+      console.log("IDS =", ids);
 
-return [];
+      const {
+        data: detail,
+        error: detailErr
+      } =
+      await supabase
+        .from("detail_peminjaman")
+        .select(`
+          peminjaman_id,
+          jumlah,
+          buku:buku_id(
+            judul
+          )
+        `)
+        .in(
+          "peminjaman_id",
+          ids
+        );
 
-}
+      console.log("DETAIL =", detail);
+      console.log("DETAIL ERROR =", detailErr);
 
-const ids =
-rows.map(
-(r:any)=>
-r.id
-);
+      if (detailErr)
+        throw detailErr;
 
-console.log("IDS =", ids);
+      const merged =
+        rows.map(
+          (r:any)=>({
 
-const {
-data: detail,
-error: detailErr
-}
-=
-await supabase
-.from("detail_peminjaman")
-.select(`
-peminjaman_id,
-jumlah,
-buku:buku_id(
-judul
-)
-`)
-.in(
-"peminjaman_id",
-ids
-);
+            ...r,
 
-console.log("DETAIL =", detail);
-console.log("DETAIL ERROR =", detailErr);
+            detail_peminjaman:
+              (detail ?? [])
+              .filter(
+                (d:any)=>
+                String(d.peminjaman_id)
+                ===
+                String(r.id)
+              )
 
-if (detailErr)
-throw detailErr;
+          })
+        );
 
-const merged =
-rows.map(
-(r:any)=>({
+      console.log("MERGED =", merged);
 
-...r,
+      return merged;
 
-detail_peminjaman:
-(detail ?? [])
-.filter(
-(d:any)=>
-String(
-d.peminjaman_id
-)
-===
-String(
-r.id
-)
-)
+    }
 
-})
-);
+    catch(err){
 
-console.log("MERGED =", merged);
+      console.log(
+        "LAPORAN ERROR =",
+        err
+      );
 
-return merged;
+      return [];
 
-}
+    }
 
-catch(err){
+  }
 
-console.log(
-"LAPORAN ERROR =",
-err
-);
-
-return [];
-
-}
-
-},
+});
   const exportCSV = () => {
     if (!data || data.length === 0) return toast.error("Tidak ada data");
     const rows = [["Tanggal Pinjam", "Tanggal Kembali", "Peminjam", "Kode Peminjam", "Buku", "Status"]];
