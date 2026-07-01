@@ -386,27 +386,22 @@ return merged;
                 )}
                 </td>
                 
-                <td className="px-4 py-3">
-                
+               <td className="px-4 py-3">
                 <span
-                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs capitalize ${
-                p.status?.toLowerCase() === "dikembalikan"
-                ? "bg-secondary text-secondary-foreground"
-                : overdue
-                ? "bg-destructive/10 text-destructive"
-                : "bg-primary/10 text-primary"
-                }`}
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs capitalize ${
+                    String(p.status).toLowerCase() === "dikembalikan"
+                      ? "bg-secondary text-secondary-foreground"
+                      : overdue
+                      ? "bg-destructive/10 text-destructive"
+                      : "bg-primary/10 text-primary"
+                  }`}
                 >
-                
-                {
-                overdue
-                ? "terlambat"
-                : p.status
-                }
-                
+                  {overdue &&
+                  String(p.status).toLowerCase() !== "dikembalikan"
+                    ? "terlambat"
+                    : p.status}
                 </span>
-                
-                </td>
+              </td>
                 
                 </tr>
                 
