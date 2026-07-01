@@ -112,6 +112,8 @@ r.id
 );
 
 return merged;
+  },
+});
 
   const exportCSV = () => {
     if (!data || data.length === 0) return toast.error("Tidak ada data");
