@@ -23,16 +23,161 @@ function LaporanPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["laporan", from, to],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("peminjaman")
-        .select("*, peminjam(nama, kode_peminjam), detail_peminjaman(jumlah, buku(judul, kode_buku))")
-        .gte("tanggal_pinjam", from)
-        .lte("tanggal_pinjam", to)
-        .order("tanggal_pinjam", { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
+
+const { data: pinjam, error } =
+await supabase
+.from("peminjaman")
+.select(`
+*,
+peminjam:peminjam_id(
+nama,
+kode_peminjam
+)
+`)
+.gte(
+"tanggal_pinjam",
+from
+)
+.lte(
+"tanggal_pinjam",
+to
+)
+.order(
+"tanggal_pinjam",
+{
+ascending:false
+}
+);
+
+if (error)
+throw error;
+
+const rows =
+pinjam ?? [];
+
+if (!rows.length)
+return [];
+
+const ids =
+rows.map(
+(r)=>r.id
+);
+
+const {
+data: detail,
+error: detailErr
+}
+=
+await supabase
+.from(
+"detail_peminjaman"
+)
+.select(`
+peminjaman_id,
+buku_id,
+jumlah
+`)
+.in(
+"peminjaman_id",
+ids
+);
+
+if (
+detailErr
+)
+throw detailErr;
+
+const bukuIds =
+[
+...new Set(
+(detail??[])
+.map(
+(d:any)=>
+d.buku_id
+)
+.filter(
+Boolean
+)
+)
+];
+
+const {
+data:buku,
+error:bukuErr
+}
+=
+bukuIds.length
+?
+await supabase
+.from(
+"buku"
+)
+.select(`
+id,
+judul,
+kode_buku
+`)
+.in(
+"id",
+bukuIds
+)
+:
+{
+data:[]
+};
+
+if(
+bukuErr
+)
+throw bukuErr;
+
+const bukuMap =
+new Map(
+(buku??[])
+.map(
+(b:any)=>[
+b.id,
+b
+]
+)
+);
+
+return rows.map(
+(r:any)=>({
+
+...r,
+
+detail_peminjaman:
+(detail??[])
+.filter(
+(d:any)=>
+String(
+d.peminjaman_id
+)
+===
+String(
+r.id
+)
+)
+.map(
+(d:any)=>({
+
+jumlah:
+d.jumlah,
+
+buku:
+bukuMap.get(
+d.buku_id
+)
+?? null
+
+})
+)
+
+})
+);
+
+}
 
   const exportCSV = () => {
     if (!data || data.length === 0) return toast.error("Tidak ada data");
@@ -128,12 +273,58 @@ function LaporanPage() {
                     <td className="px-4 py-3">{format(new Date(p.tanggal_pinjam), "dd MMM yyyy")}</td>
                     <td className="px-4 py-3">{format(new Date(p.tanggal_kembali), "dd MMM yyyy")}</td>
                     <td className="px-4 py-3">{p.peminjam?.nama}</td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {p.detail_peminjaman?.map((d: { jumlah: number; buku: { judul: string } | null }, i: number) => (
-                        <div key={i}>{d.buku?.judul} × {d.jumlah}</div>
-                      ))}
-                    </td>
-                    <td className="px-4 py-3 capitalize">{p.status}</td>
+                    <td className="px-4 py-3">
+
+{
+p.detail_peminjaman?.length
+?
+
+p.detail_peminjaman.map(
+(
+d:any,
+i:number
+)=>(
+
+<div key={i}>
+
+{
+d.buku?.judul
+?? "Buku tidak ditemukan"
+}
+
+×
+
+{
+d.jumlah
+}
+
+</div>
+
+)
+)
+
+:
+
+"Belum ada buku"
+
+}
+
+</td>
+                    <td className="px-4 py-3">
+
+<span
+className={
+p.status === "Kembali"
+? "text-green-600"
+: "text-blue-600"
+}
+>
+
+{p.status}
+
+</span>
+
+</td>
                   </tr>
                 ))}
               </tbody>
