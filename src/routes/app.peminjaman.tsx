@@ -336,7 +336,7 @@ return merged;
               <tbody>
                 {list.map((p:any) => {
                 const overdue =
-                p.status?.toLowerCase() !== "dikembalikan" &&
+                p.status?.toLowerCase() !== "Kembali" &&
                 p.tanggal_kembali < today;    
                 return ( 
                 <tr
@@ -389,7 +389,7 @@ return merged;
                <td className="px-4 py-3">
                 <span
                   className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs capitalize ${
-                    String(p.status).toLowerCase() === "dikembalikan"
+                    String(p.status).toLowerCase() === "Kembali"
                       ? "bg-secondary text-secondary-foreground"
                       : overdue
                       ? "bg-destructive/10 text-destructive"
@@ -397,7 +397,7 @@ return merged;
                   }`}
                 >
                   {overdue &&
-                  String(p.status).toLowerCase() !== "dikembalikan"
+                  String(p.status).toLowerCase() !== "Kembali"
                     ? "terlambat"
                     : p.status}
                 </span>
