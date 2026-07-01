@@ -20,121 +20,152 @@ function LaporanPage() {
   const [from, setFrom] = useState(format(startOfMonth(new Date()), "yyyy-MM-dd"));
   const [to, setTo] = useState(format(new Date(), "yyyy-MM-dd"));
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["laporan", from, to],
-    queryFn: async () => {
+const { data = [], isLoading } = useQuery({
+  queryKey: ["laporan", from, to],
 
+  queryFn: async () => {
     const { data: pinjam, error } =
-    await supabase
-    .from("peminjaman")
-    .select(`*,peminjam:peminjam_id(nama,kode_peminjam)`)
-    .gte("crated_at", from + "T00:00:00")
-    .lte("created_at", to + "T23:59:59")
-    .order("tanggal_pinjam",{ascending:false});
-    if (error)
-    throw error;
+      await supabase
+        .from("peminjaman")
+        .select(`
+          *,
+          peminjam:peminjam_id(
+            nama,
+            kode_peminjam
+          )
+        `)
+        .gte(
+          "created_at",
+          from + "T00:00:00"
+        )
+        .lte(
+          "created_at",
+          to + "T23:59:59"
+        )
+        .order(
+          "tanggal_pinjam",
+          {
+            ascending: false,
+          }
+        );
 
-const rows =
-pinjam ?? [];
+    if (error) throw error;
 
-if (!rows.length)
-return [];
+    const rows = pinjam ?? [];
 
-const ids =
-rows.map(
-(r)=>r.id
-);
+    if (!rows.length) {
+      return [];
+    }
 
-const {
-data: detail,
-error: detailErr
-}
-=
-await supabase
-.from(
-"detail_peminjaman"
-)
-.select(`
-peminjaman_id,
-buku_id,
-jumlah
-`)
-.in(
-"peminjaman_id",
-ids
-);
-
-if (
-detailErr
-)
-throw detailErr;
-
-const bukuIds =
-[
-...new Set(
-(detail??[])
-.map(
-(d:any)=>
-d.buku_id
-)
-.filter(
-Boolean
-)
-)
-];
-
-const {
-data:buku,
-error:bukuErr
-}
-=
-bukuIds.length
-?
-await supabase
-.from(
-"buku"
-)
-.select(`
-id,
-judul,
-kode_buku
-`)
-.in(
-"id",
-bukuIds
-)
-:
-{
-data:[]
-};
-
-if(
-bukuErr
-)
-throw bukuErr;
-
-const bukuMap =
-new Map(
-(buku??[])
-.map(
-(b:any)=>[
-b.id,
-b
-]
-)
-);
-console.log("LAPORAN RAW", rows);
-      console.log("DETAIL", detail);
-      console.log("BUKU", buku);
-      
-    const merged =rows.map((r:any)=>({...r,detail_peminjaman:(detail??[])
-      .filter((d:any)=>String(d.peminjaman_id)===String(r.id))
-      .map((d:any)=>({jumlah:d.jumlah,buku:bukuMap.get(d.buku_id)?? null}))
-      })
+    const ids =
+      rows.map(
+        (r:any) => r.id
       );
-      console.log("LAPORAN MERGED",merged);
-      return merged;
-    },});
+
+    const {
+      data: detail,
+      error: detailErr,
+    } =
+      await supabase
+        .from(
+          "detail_peminjaman"
+        )
+        .select(`
+          peminjaman_id,
+          buku_id,
+          jumlah
+        `)
+        .in(
+          "peminjaman_id",
+          ids
+        );
+
+    if (detailErr)
+      throw detailErr;
+
+    const bukuIds = [
+      ...new Set(
+        (detail ?? [])
+          .map(
+            (d:any) =>
+              d.buku_id
+          )
+          .filter(Boolean)
+      ),
+    ];
+
+    const {
+      data: buku,
+      error: bukuErr,
+    } =
+      bukuIds.length
+        ? await supabase
+            .from("buku")
+            .select(`
+              id,
+              judul,
+              kode_buku
+            `)
+            .in(
+              "id",
+              bukuIds
+            )
+        : {
+            data: [],
+            error: null,
+          };
+
+    if (bukuErr)
+      throw bukuErr;
+
+    const bukuMap =
+      new Map(
+        (buku ?? []).map(
+          (b:any) => [
+            b.id,
+            b,
+          ]
+        )
+      );
+
+    const merged =
+      rows.map(
+        (r:any) => ({
+          ...r,
+
+          detail_peminjaman:
+            (detail ?? [])
+              .filter(
+                (d:any) =>
+                  String(
+                    d.peminjaman_id
+                  ) ===
+                  String(
+                    r.id
+                  )
+              )
+              .map(
+                (d:any) => ({
+                  jumlah:
+                    d.jumlah,
+
+                  buku:
+                    bukuMap.get(
+                      d.buku_id
+                    ) ?? null,
+                })
+              ),
+        })
+      );
+
+    console.log(
+      "LAPORAN",
+      merged
+    );
+
+    return merged;
+  },
+});
 
   const exportCSV = () => {
     if (!data || data.length === 0) return toast.error("Tidak ada data");
