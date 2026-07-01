@@ -148,37 +148,32 @@ return rows.map(
 ...r,
 
 detail_peminjaman:
-(detail??[])
+(detail ?? [])
 .filter(
 (d:any)=>
-String(
-d.peminjaman_id
-)
-===
-String(
-r.id
-)
+String(d.peminjaman_id) === String(r.id)
 )
 .map(
 (d:any)=>({
 
-jumlah:
-d.jumlah,
+jumlah:d.jumlah,
 
 buku:
 bukuMap.get(
 d.buku_id
-)
-?? null
+) ?? null
 
 })
+
 )
 
 })
+
 );
 
-}
+},
 
+});
   const exportCSV = () => {
     if (!data || data.length === 0) return toast.error("Tidak ada data");
     const rows = [["Tanggal Pinjam", "Tanggal Kembali", "Peminjam", "Kode Peminjam", "Buku", "Status"]];
