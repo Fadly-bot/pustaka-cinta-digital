@@ -67,6 +67,14 @@ function DaftarPeminjamPage() {
     const { data: debugRole, error: debugError } = await supabase.rpc("debug_role");
     console.log("DEBUG ROLE =", debugRole);
     console.log("DEBUG ERROR =", debugError);
+    const test = await supabase
+  .from("pendaftaran_peminjam")
+  .select("*")
+  .limit(1);
+
+console.log("TEST SELECT =", test.data);
+console.log("TEST SELECT ERROR =", test.error);
+    
    const { data, error } = await supabase
   .from("pendaftaran_peminjam")
      
