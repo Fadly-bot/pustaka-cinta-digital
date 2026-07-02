@@ -62,6 +62,8 @@ function DaftarPeminjamPage() {
     const payload = { ...parsed.data, email: parsed.data.email || null };
     const{data: sessionData,} = await supabase.auth.getSession();
     console.log("SESSION =", sessionData);
+    const {data: { user },} = await supabase.auth.getUser();
+    console.log("USER =", user);
    const { data, error } = await supabase
   .from("peminjam")
      
