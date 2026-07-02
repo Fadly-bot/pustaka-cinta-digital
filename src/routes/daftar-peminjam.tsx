@@ -76,10 +76,10 @@ console.log("INSERT ERROR =", error);
 
 if (error) {
   console.error(error);
-{
+
       toast.error("Gagal mendaftar: " + error.message);
       return;
-    },}
+    }
     setSuccess(data.kode_peminjam);
   };
 
