@@ -65,7 +65,7 @@ function DaftarPeminjamPage() {
     const {data: { user },} = await supabase.auth.getUser();
     console.log("USER =", user);
    const { data, error } = await supabase
-  .from("peminjam")
+  .from("pendaftaran_peminjaman")
      
   .insert({
     nama: form.nama,
@@ -85,7 +85,7 @@ if (error) {
       toast.error("Gagal mendaftar: " + error.message);
       return;
     }
-    setSuccess(data?.[0]?.kode_peminjam ?? " ");
+    setSuccess("Permohonan pendaftaran berhasil dikirim dan sedang menunggu persetujuan petugas.");
     setLoading(false);
   };
 
