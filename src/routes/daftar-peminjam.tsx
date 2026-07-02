@@ -60,10 +60,11 @@ function DaftarPeminjamPage() {
     }
     setLoading(true);
     const payload = { ...parsed.data, email: parsed.data.email || null };
+    const{data: sessionData,} = await supabase.auth.getSession();
+    consolse.log("SESSION =", sessionData);
    const { data, error } = await supabase
   .from("peminjam")
-     const{data: sessionData,} = await supabase.auth.getSession();
-    consolse.log("SESSION =", sessionData),
+     
   .insert({
     nama: form.nama,
     nomor_identitas: form.nomor_identitas,
