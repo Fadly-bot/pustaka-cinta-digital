@@ -63,7 +63,7 @@ function DaftarPeminjamPage() {
    const { data, error } = await supabase
   .from("peminjam")
      const{data: sessionData,} = await supabase.auth.getSession();
-    consolse.log("SESSION =", sessionData);
+    consolse.log("SESSION =", sessionData)
   .insert({
     nama: form.nama,
     nomor_identitas: form.nomor_identitas,
