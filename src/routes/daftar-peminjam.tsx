@@ -64,6 +64,9 @@ function DaftarPeminjamPage() {
     console.log("SESSION =", sessionData);
     const {data: { user },} = await supabase.auth.getUser();
     console.log("USER =", user);
+    const { data: debugRole, error: debugError } = await supabase.rpc("debug_role");
+    console.log("DEBUG ROLE =", debugRole);
+    console.log("DEBUG ERROR =", debugError);
    const { data, error } = await supabase
   .from("pendaftaran_peminjam")
      
