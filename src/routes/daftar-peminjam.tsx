@@ -60,16 +60,26 @@ function DaftarPeminjamPage() {
     }
     setLoading(true);
     const payload = { ...parsed.data, email: parsed.data.email || null };
-    const { data, error } = await supabase
-      .from("peminjam")
-      .insert(payload as never)
-      .select("kode_peminjam")
-      .single();
-    setLoading(false);
-    if (error) {
+   const { data, error } = await supabase
+  .from("peminjam")
+  .insert({
+    nama: form.nama,
+    nomor_identitas: form.nomor_identitas,
+    nomor_hp: form.nomor_hp,
+    alamat: form.alamat,
+    email: form.email,
+  })
+  .select();
+
+console.log("INSERT DATA =", data);
+console.log("INSERT ERROR =", error);
+
+if (error) {
+  console.error(error);
+{
       toast.error("Gagal mendaftar: " + error.message);
       return;
-    }
+    },}
     setSuccess(data.kode_peminjam);
   };
 
