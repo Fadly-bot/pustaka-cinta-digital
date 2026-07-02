@@ -65,7 +65,7 @@ function DaftarPeminjamPage() {
     const {data: { user },} = await supabase.auth.getUser();
     console.log("USER =", user);
    const { data, error } = await supabase
-  .from("pendaftaran_peminjaman")
+  .from("pendaftaran_peminjam")
      
   .insert({
     nama: form.nama,
