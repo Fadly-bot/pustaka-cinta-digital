@@ -61,14 +61,14 @@ function DaftarPeminjamPage() {
     setLoading(true);
     const payload = { ...parsed.data, email: parsed.data.email || null };
     const{data: sessionData,} = await supabase.auth.getSession();
-    consolse.log("SESSION =", sessionData);
+    console.log("SESSION =", sessionData);
    const { data, error } = await supabase
   .from("peminjam")
      
   .insert({
     nama: form.nama,
-    nomor_identitas: form.nomor_identitas,
-    nomor_hp: form.nomor_hp,
+    no_identitas: form.no_identitas,
+    no_hp: form.no_hp,
     alamat: form.alamat,
     email: form.email,
   })
@@ -83,7 +83,8 @@ if (error) {
       toast.error("Gagal mendaftar: " + error.message);
       return;
     }
-    setSuccess(data.kode_peminjam);
+    setSuccess(data?.[0]?.kode_peminjam ?? " ");
+    setLoading(false);
   };
 
   if (success) {
